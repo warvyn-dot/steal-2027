@@ -105,8 +105,13 @@ h1, h2, h3 { margin: 0; line-height: 0; }
   background: var(--art-1) var(--hero-img) center / cover no-repeat; aspect-ratio: 6 / 5;
   padding: 28px 32px; display: flex; flex-direction: column; gap: 12px;
 }
-.hero-lead { margin: 0; max-width: 400px; font-size: 21px; line-height: 30px; font-weight: 500; color: var(--ink); }
-[data-theme="night"] .hero-lead { text-shadow: 0 1px 2px rgba(10, 4, 24, 0.9), 0 0 12px rgba(10, 4, 24, 0.8); }
+/* Frosted panel so the line stays readable wherever it lands on the photo */
+.hero-lead {
+  margin: 0; max-width: 420px; align-self: flex-start; font-size: 20px; line-height: 28px; font-weight: 500; color: var(--ink);
+  padding: 8px 14px; border-radius: 12px; background: rgba(28, 10, 56, 0.72);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+[data-theme="golden"] .hero-lead { background: rgba(255, 250, 253, 0.86); }
 .hero .title-wrap { width: min(417px, 78%); }
 .banner {
   position: relative; border: 2px solid var(--art-6); border-radius: 18px; box-shadow: var(--lift); overflow: hidden;
