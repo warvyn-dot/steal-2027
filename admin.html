@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Steal 2027: crew dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="page" style="max-width: 900px">
+  <div class="topbar">
+    <span class="tag tag-act">Crew only</span>
+    <button class="btn" id="theme-toggle" type="button">Switch to day</button>
+    <a href="index.html">Guest page</a>
+  </div>
+
+  <section class="card" id="gate" aria-labelledby="gate-h">
+    <h1 id="gate-h" style="font-size: 28px; line-height: 34px; font-weight: 600">Enter the PIN</h1>
+    <form id="pin-form" class="row" novalidate>
+      <div class="field" style="width: 160px"><label class="label" for="pin">PIN</label>
+        <input id="pin" inputmode="numeric" autocomplete="off" maxlength="12" required></div>
+      <button class="btn btn-primary" type="submit">Open dashboard</button>
+    </form>
+    <p class="status" id="pin-status" role="status"></p>
+  </section>
+
+  <div id="dash" hidden style="display: flex; flex-direction: column; gap: 24px">
+    <div class="row" style="justify-content: space-between; align-items: center">
+      <p class="script">The crew so far</p>
+      <div class="row">
+        <button class="btn" id="refresh" type="button">Refresh</button>
+        <button class="btn btn-quiet" id="lock" type="button">Lock</button>
+      </div>
+    </div>
+    <p class="status" id="dash-status" role="status"></p>
+
+    <div class="stats">
+      <div class="card"><span class="label">Guests coming</span><span class="stat-num" id="stat-guests">0</span></div>
+      <div class="card"><span class="label">RSVPs</span><span class="stat-num" id="stat-rsvps">0</span></div>
+      <div class="card"><span class="label">Drinks claimed</span><span class="stat-num" id="stat-claims">0</span></div>
+      <div class="card"><span class="label">Write-ins</span><span class="stat-num" id="stat-writeins">0</span></div>
+    </div>
+
+    <section class="card"><h2 style="font-size: 24px; line-height: 30px; font-weight: 600">RSVPs</h2>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Coming</th><th>Note</th><th>When</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="t-rsvps"></tbody></table></div></section>
+
+    <section class="card"><h2 style="font-size: 24px; line-height: 30px; font-weight: 600">Drink claims</h2>
+      <div class="table-wrap"><table><thead><tr><th>Drink</th><th>Real-world</th><th>Claimed by</th><th>When</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="t-claims"></tbody></table></div>
+      <p class="muted small" style="margin: 0" id="open-drinks"></p></section>
+
+    <section class="card"><h2 style="font-size: 24px; line-height: 30px; font-weight: 600">Not on the list</h2>
+      <div class="table-wrap"><table><thead><tr><th>Item</th><th>From</th><th>When</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="t-writeins"></tbody></table></div></section>
+  </div>
+</main>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
