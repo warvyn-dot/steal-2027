@@ -7,13 +7,13 @@
 <title>Steal 2027: crew dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20261125e">
 </head>
 <body>
 <main class="page" style="max-width: 900px">
-  <div class="topbar">
+  <div class="topbar admin-top">
     <span class="tag tag-act">Crew only</span>
-    <button class="btn" id="theme-toggle" type="button">Switch to day</button>
+    <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch to day"><img class="theme-icon theme-sun" src="assets/img/theme-sun.png" alt="" width="52" height="52"><img class="theme-icon theme-moon" src="assets/img/theme-moon.png" alt="" width="52" height="52" onerror="this.closest('button').classList.add('no-moon')"><span class="theme-fallback" aria-hidden="true">Night</span></button>
     <a href="index.html">Guest page</a>
   </div>
 
@@ -27,10 +27,10 @@
     <p class="status" id="pin-status" role="status"></p>
   </section>
 
-  <div id="dash" hidden style="display: flex; flex-direction: column; gap: 24px">
-    <div class="row" style="justify-content: space-between; align-items: center">
+  <div id="dash" hidden style="display: flex; flex-direction: column; gap: 14px">
+    <div class="admin-head">
       <p class="script">The crew so far</p>
-      <div class="row">
+      <div class="admin-actions">
         <button class="btn" id="refresh" type="button">Refresh</button>
         <button class="btn btn-quiet" id="lock" type="button">Lock</button>
       </div>
@@ -40,23 +40,52 @@
     <div class="stats">
       <div class="card"><span class="label">Guests coming</span><span class="stat-num" id="stat-guests">0</span></div>
       <div class="card"><span class="label">RSVPs</span><span class="stat-num" id="stat-rsvps">0</span></div>
-      <div class="card"><span class="label">Drinks claimed</span><span class="stat-num" id="stat-claims">0</span></div>
-      <div class="card"><span class="label">Write-ins</span><span class="stat-num" id="stat-writeins">0</span></div>
+      <div class="card"><span class="label">Crew supplies</span><span class="stat-num" id="stat-claims">0</span></div>
+      <div class="card"><span class="label">Your run</span><span class="stat-num" id="stat-run">0</span></div>
     </div>
 
-    <section class="card"><h2 style="font-size: 24px; line-height: 30px; font-weight: 600">RSVPs</h2>
-      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Coming</th><th>Note</th><th>When</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="t-rsvps"></tbody></table></div></section>
+    <section class="card adm-card" aria-labelledby="run-h">
+      <div class="adm-card-head">
+        <h2 id="run-h" class="adm-h">Shopping run</h2>
+        <span class="adm-count" id="run-count"></span>
+      </div>
+      <div class="ready-bar" aria-hidden="true"><div class="ready-fill" id="run-fill"></div></div>
+      <div class="seg" role="tablist" aria-label="Show">
+        <button type="button" role="tab" class="seg-btn" id="seg-todo" aria-selected="true">Still needed</button>
+        <button type="button" role="tab" class="seg-btn" id="seg-all" aria-selected="false">Everything</button>
+      </div>
+      <h3 class="adm-sub">Your run <span class="muted small">Tap to check off</span></h3>
+      <div id="host-list" class="check-groups"></div>
+      <form id="host-add" class="host-add" novalidate>
+        <label class="sr-only" for="host-new">Add something to your run</label>
+        <input id="host-new" maxlength="80" placeholder="Add something to your run" autocomplete="off">
+        <button class="btn btn-primary" type="submit">Add</button>
+      </form>
+      <h3 class="adm-sub">From the crew <span class="muted small">Checks itself as guests claim</span></h3>
+      <ul id="crew-checks" class="check-list"></ul>
+    </section>
 
-    <section class="card"><h2 style="font-size: 24px; line-height: 30px; font-weight: 600">Drink claims</h2>
-      <div class="table-wrap"><table><thead><tr><th>Drink</th><th>Real-world</th><th>Claimed by</th><th>When</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="t-claims"></tbody></table></div>
-      <p class="muted small" style="margin: 0" id="open-drinks"></p></section>
+    <section class="card adm-card" aria-labelledby="guests-h">
+      <div class="adm-card-head"><h2 id="guests-h" class="adm-h">Guest list</h2><span class="adm-count" id="guests-count"></span></div>
+      <ul class="adm-rows" id="t-rsvps"></ul>
+    </section>
 
-    <section class="card"><h2 style="font-size: 24px; line-height: 30px; font-weight: 600">Not on the list</h2>
-      <div class="table-wrap"><table><thead><tr><th>Item</th><th>From</th><th>When</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="t-writeins"></tbody></table></div></section>
+    <section class="card adm-card" aria-labelledby="also-h2">
+      <div class="adm-card-head"><h2 id="also-h2" class="adm-h">Also bringing</h2></div>
+      <h3 class="adm-sub">Beer</h3>
+      <ul class="adm-rows" id="t-beer"></ul>
+      <h3 class="adm-sub">Something else</h3>
+      <ul class="adm-rows" id="t-writeins"></ul>
+    </section>
+
+    <section class="card adm-card" aria-labelledby="prep-h">
+      <div class="adm-card-head"><h2 id="prep-h" class="adm-h">Drink prep</h2></div>
+      <div id="t-prep" class="prep-list"></div>
+    </section>
   </div>
 </main>
-<script src="config.js"></script>
-<script src="shared.js"></script>
-<script src="admin.js"></script>
+<script src="config.js?v=20261125e"></script>
+<script src="shared.js?v=20261125e"></script>
+<script src="admin.js?v=20261125e"></script>
 </body>
 </html>

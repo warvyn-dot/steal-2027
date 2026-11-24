@@ -2,31 +2,50 @@
 <html lang="en" data-theme="night">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Steal 2027: a New Year's Eve job</title>
-<meta name="description" content="New Year's Eve at Sean and Grace's. RSVP and claim a drink from the game.">
+<meta name="description" content="New Year's Eve at Sean and Grace's. RSVP, claim a drink from the game, and get directions.">
+<meta name="theme-color" content="#1c0a38">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Steal 2027">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20261125e">
 </head>
 <body>
-<main class="page">
-
-  <div class="topbar">
-    <span class="tag tag-act">New mission</span>
-    <button class="btn" id="theme-toggle" type="button">Switch to day</button>
-    <div class="stars">
-      <span class="label">Heat level</span>
-      <svg width="126" height="22" viewBox="0 0 126 22" role="img" aria-label="Heat level: five out of five stars" style="fill: var(--goal)">
-        <path d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path>
-        <path transform="translate(26 0)" d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path>
-        <path transform="translate(52 0)" d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path>
-        <path transform="translate(78 0)" d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path>
-        <path transform="translate(104 0)" d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path>
-      </svg>
+<div class="call" id="call" hidden aria-live="polite">
+  <div class="call-ring" id="call-ring">
+    <p class="label call-top" id="call-status">Incoming call</p>
+    <div class="call-avatar" aria-hidden="true">B</div>
+    <p class="call-name">Brian</p>
+    <p class="call-sub" id="call-sub">mobile</p>
+    <div class="call-actions">
+      <button type="button" class="call-btn decline" id="call-decline" aria-label="Decline call"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><span>Decline</span></button>
+      <button type="button" class="call-btn accept" id="call-accept" aria-label="Accept call"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><span>Accept</span></button>
     </div>
   </div>
+  <div class="call-chat" id="call-chat" hidden>
+    <p class="label call-top">Brian &middot; connected</p>
+    <ol class="bubbles" id="bubbles"></ol>
+    <button type="button" class="btn btn-primary call-go" id="call-go" hidden>I'm in. Show me the job</button>
+  </div>
+</div>
+<div class="app">
+<header class="page topbar-wrap">
+  <div class="topbar">
+    <span class="mission-tag" id="mission-tag" role="img" aria-label="New mission"><img class="art-night when-main" src="assets/img/missions/new-mission-night.png" alt=""><img class="art-day when-main" src="assets/img/missions/new-mission-day.png" alt=""><img class="art-night when-side" src="assets/img/missions/side-mission-night.png" alt=""><img class="art-day when-side" src="assets/img/missions/side-mission-day.png" alt=""></span>
+    <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch to day"><img class="theme-icon theme-sun" src="assets/img/theme-sun.png" alt="" width="52" height="52"><img class="theme-icon theme-moon" src="assets/img/theme-moon.png" alt="" width="52" height="52" onerror="this.closest('button').classList.add('no-moon')"><span class="theme-fallback" aria-hidden="true">Night</span></button>
+  </div>
+</header>
 
+<main>
+
+<!-- ================= HOME ================= -->
+<section class="view page" id="view-home" aria-label="Home">
   <section class="hero">
     <p class="script">A New Year's Eve job, hosted by Sean and Grace</p>
     <h1 class="title-wrap"><svg viewBox="-51 -51 3091 1750" role="img" aria-label="Steal 2027" class="title-art" style="overflow: visible">
@@ -45,48 +64,137 @@
 <use href="#t-steal-word" style="fill: #000000; stroke: #000000; stroke-width: 40; stroke-linejoin: round"></use>
 <use href="#t-steal-word" style="fill: #ffffff; stroke: #ffffff; stroke-width: 5; stroke-linejoin: round"></use>
 </svg></h1>
-    <p class="hero-lead">One last job before midnight. Leave 2026 in the rearview.</p>
+    <p class="hero-lead" id="hero-lead">One last job before midnight.<br>Leave 2026 in the rearview.</p>
   </section>
 
-  <div class="grid2">
-    <div class="card">
-      <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg><span class="label">When</span></div>
-      <h2><span class="pd" role="img" aria-label="Thu, Dec 31" style="width: 120px; height: 27px; -webkit-mask-image: url('assets/headers/02-thu-dec-31.svg'); mask-image: url('assets/headers/02-thu-dec-31.svg')"></span></h2>
-      <p class="muted" style="margin: 0">9 PM until 2027 shows up</p>
-    </div>
-    <div class="card">
-      <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg><span class="label">Where</span></div>
-      <h2><span class="pd" role="img" aria-label="Our place" style="width: 107px; height: 23px; -webkit-mask-image: url('assets/headers/03-our-place.svg'); mask-image: url('assets/headers/03-our-place.svg')"></span></h2>
-      <p class="muted" style="margin: 0">1117 E Vandergriff Dr<br>Apt 1423<br>Carrollton, TX 75006</p>
-    </div>
-    <div class="card">
-      <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h20"></path><path d="M3.5 10l1 5a3 3 0 0 0 3 2.5h1a3 3 0 0 0 3-2.6l.5-3"></path><path d="M20.5 10l-1 5a3 3 0 0 1-3 2.5h-1a3 3 0 0 1-3-2.6l-.5-3"></path></svg><span class="label">Dress code</span></div>
-      <h2><span class="pd" role="img" aria-label="Neon and florals" style="width: 184px; height: 27px; -webkit-mask-image: url('assets/headers/04-neon-and-florals.svg'); mask-image: url('assets/headers/04-neon-and-florals.svg')"></span></h2>
-      <p class="muted" style="margin: 0">Loud shirts, shades after dark, getaway-car energy.</p>
-    </div>
-    <div class="card">
-      <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"></path><path d="M12 13v7"></path><path d="M8.5 21h7"></path></svg><span class="label">Bring</span></div>
-      <h2><span class="pd" role="img" aria-label="Drinks from the game" style="width: 251px; height: 27px; -webkit-mask-image: url('assets/headers/05-drinks-from-the-game.svg'); mask-image: url('assets/headers/05-drinks-from-the-game.svg')"></span></h2>
-      <p class="muted" style="margin: 0">Claim one on the <a href="#drinks">drink list</a> below.</p>
+  <div class="ticker" id="ticker" hidden>
+    <span class="ticker-live"><span class="ticker-dot" aria-hidden="true"></span>Live</span>
+    <p class="sr-only" id="ticker-sr" aria-live="polite"></p>
+    <div class="ticker-window" aria-hidden="true">
+      <div class="ticker-track" id="ticker-track"></div>
     </div>
   </div>
 
-  <section class="card" aria-labelledby="rsvp-h">
-    <h2 id="rsvp-h"><span class="pd" role="img" aria-label="RSVP by Sat, Dec 26" style="width: 219px; height: 27px; -webkit-mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg'); mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg')"></span></h2>
-    <p class="muted" style="margin: 0">Plus-ones welcome. Tell us how many are rolling with you.</p>
-    <form id="rsvp-form" class="row" novalidate>
-      <div class="field grow"><label class="label" for="rsvp-name">Your name</label><input id="rsvp-name" name="name" maxlength="40" autocomplete="name" required></div>
-      <div class="field" style="width: 110px"><label class="label" for="rsvp-size">Coming</label>
-        <select id="rsvp-size" name="size"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
-      <div class="field" style="flex: 1 1 100%"><label class="label" for="rsvp-note">Note (optional)</label><input id="rsvp-note" name="note" maxlength="200"></div>
-      <button class="btn btn-primary" type="submit">Send my RSVP</button>
-    </form>
-    <p class="status" id="rsvp-status" role="status"></p>
-  </section>
+  <div class="grid2 home-cards">
+    <div class="card side-art-card when-art" role="group" aria-label="When">
+      <span class="sr-only">A desk calendar with December 31st circled.</span>
+      <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg><span class="label">When</span></div>
+      <h2><span class="pd" role="img" aria-label="Thu, Dec 31" style="width: 120px; height: 27px; -webkit-mask-image: url('assets/headers/02-thu-dec-31.svg'); mask-image: url('assets/headers/02-thu-dec-31.svg')"></span></h2>
+      <p style="margin: 0">9 PM until<br>2027 shows up</p>
+    </div>
+    <a class="card card-link art-card place-art" href="#location">
+      <span class="art-bg" role="img" aria-label="A red-brick apartment building at golden hour under a big shade tree, with a black hatchback parked out front and a porch full of flowers."></span>
+      <div class="look-body art-body">
+        <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg><span class="label">Where</span></div>
+        <h2><span class="pd" role="img" aria-label="Our place" style="width: 107px; height: 23px; -webkit-mask-image: url('assets/headers/03-our-place.svg'); mask-image: url('assets/headers/03-our-place.svg')"></span></h2>
+        <p class="muted" style="margin: 0">1117 E Vandergriff Dr, Apt 1423, Carrollton</p>
+        <span class="go">Map and directions</span>
+      </div>
+    </a>
+    <a class="card card-link art-card" href="#dress-code">
+      <span class="art-bg crew-art" role="img" aria-label="The crew on a beachfront boardwalk in neon and florals: tropical-print shirts, a mint linen suit, and a magenta windbreaker with bike shorts."></span>
+      <div class="look-body art-body">
+        <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h20"></path><path d="M3.5 10l1 5a3 3 0 0 0 3 2.5h1a3 3 0 0 0 3-2.6l.5-3"></path><path d="M20.5 10l-1 5a3 3 0 0 1-3 2.5h-1a3 3 0 0 1-3-2.6l-.5-3"></path></svg><span class="label">Dress code</span></div>
+        <h2><span class="pd" role="img" aria-label="Neon and florals" style="width: 184px; height: 27px; -webkit-mask-image: url('assets/headers/04-neon-and-florals.svg'); mask-image: url('assets/headers/04-neon-and-florals.svg')"></span></h2>
+        <p class="muted" style="margin: 0">Loud shirts, shades after dark, getaway-car energy.</p>
+        <span class="go">See the look</span>
+      </div>
+    </a>
+    <a class="card card-link art-card drinks-art" href="#drinks">
+      <span class="art-bg" role="img" aria-label="Drinks lined up on a beachfront bar: a frozen piña colada, a margarita and a beer by day, or a martini, an old fashioned and red wine under neon at night."></span>
+      <div class="look-body art-body">
+        <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"></path><path d="M12 13v7"></path><path d="M8.5 21h7"></path></svg><span class="label">Bring</span></div>
+        <h2><span class="pd" role="img" aria-label="Drinks" style="width: 92px; height: 29px; -webkit-mask-image: url('assets/headers/25-drinks.svg'); mask-image: url('assets/headers/25-drinks.svg')"></span></h2>
+        <p class="muted" style="margin: 0">Grab one ingredient so nobody doubles up.</p>
+        <span class="go">Open the drink list</span>
+      </div>
+    </a>
+    <section class="card rsvp-card" aria-labelledby="rsvp-h">
+      <h2 id="rsvp-h"><span class="pd" role="img" aria-label="RSVP by Sat, Dec 26" style="width: 219px; height: 27px; -webkit-mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg'); mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg')"></span></h2>
+      <p class="muted" style="margin: 0" id="rsvp-card-text">Plus-ones welcome. Tell us who's rolling with you.</p>
+      <div class="row"><button class="btn btn-primary" type="button" data-open-rsvp>Accept the job</button></div>
+    </section>
+  </div>
 
-  <section class="banner" id="drinks">
+  <footer class="site-foot"><button type="button" class="link-btn" id="replay-call">Replay Brian's call</button><a href="admin.html">Crew login</a></footer>
+</section>
+
+<!-- ================= DRESS CODE ================= -->
+<section class="view page" id="view-dress-code" aria-label="Dress code" hidden>
+  <section class="banner">
+    <p class="script">Dress code</p>
+    <h1 class="title-wrap" style="width: min(400px, 70%)"><svg viewBox="-56 -56 3509 616" role="img" aria-label="Neon and florals" class="title-art" style="overflow: visible">
+<defs>
+<linearGradient id="t-dress-grad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" style="stop-color: var(--art-4)"></stop>
+<stop offset="0.5" style="stop-color: var(--art-3)"></stop>
+<stop offset="1" style="stop-color: var(--art-2)"></stop>
+</linearGradient>
+<g id="t-dress-word">
+<path transform="translate(-0.47999954223632813 -84.480010986328125)" fill-rule="nonzero" d="M360.959991455078,250.080001831055C360.47998046875,250.080001831055,360,250.559997558594,360,251.040008544922L360,293.760009765625 384.47998046875,293.760009765625 384.47998046875,251.040008544922C384.47998046875,250.559997558594,384,250.080001831055,383.519989013672,250.080001831055L360.959991455078,250.080001831055z M310.079986572266,173.279998779297L434.399993896484,173.279998779297C467.519989013672,173.279998779297,484.319976806641,186.240020751953,484.319976806641,212.160003662109L484.319976806641,365.279998779297 360,365.279998779297 360,402.720001220703C360,403.200012207031,360.47998046875,403.679992675781,360.959991455078,403.679992675781L383.519989013672,403.679992675781C384,403.679992675781,384.47998046875,403.200012207031,384.47998046875,402.720001220703L384.47998046875,384.480010986328 484.319976806641,384.480010986328 484.319976806641,442.080017089844C484.319976806641,467.519989013672,467.519989013672,480,434.399993896484,480L310.079986572266,480C276.959991455078,480,260.160003662109,467.519989013672,260.160003662109,442.080017089844L260.160003662109,212.160003662109C260.160003662109,186.240020751953,276.959991455078,173.279998779297,310.079986572266,173.279998779297z M12.4799995422363,173.279998779297L112.319999694824,173.279998779297 112.319999694824,192.959991455078C129.119995117188,180 154.080001831055,173.279998779297 186.720001220703,173.279998779297 219.839996337891,173.279998779297 236.639999389648,186.240020751953 236.639999389648,212.160003662109L236.639999389648,498.239990234375C236.639999389648,498.720001220703,237.119995117188,499.200012207031,237.599990844727,499.200012207031L484.319976806641,499.200012207031 484.319976806641,575.52001953125 187.199996948242,575.52001953125C153.599990844727,575.52001953125,136.800003051758,563.039978027344,136.800003051758,537.599975585938L136.800003051758,251.040008544922C136.800003051758,250.559997558594,136.31999206543,250.080001831055,135.839996337891,250.080001831055L113.279998779297,250.080001831055C112.799995422363,250.080001831055,112.319999694824,250.559997558594,112.319999694824,251.040008544922L112.319999694824,480 12.4799995422363,480 12.4799995422363,173.279998779297z M608.159973144531,250.080001831055C607.679992675781,250.080001831055,607.200012207031,250.559997558594,607.200012207031,251.040008544922L607.200012207031,402.720001220703C607.200012207031,403.200012207031,607.679992675781,403.679992675781,608.159973144531,403.679992675781L630.719970703125,403.679992675781C631.200012207031,403.679992675781,631.679992675781,403.200012207031,631.679992675781,402.720001220703L631.679992675781,251.040008544922C631.679992675781,250.559997558594,631.200012207031,250.080001831055,630.719970703125,250.080001831055L608.159973144531,250.080001831055z M557.279968261719,173.279998779297L681.599975585938,173.279998779297C714.719970703125,173.279998779297,731.52001953125,186.240020751953,731.52001953125,212.160003662109L731.52001953125,442.080017089844C731.52001953125,467.519989013672,714.719970703125,480,681.599975585938,480L557.279968261719,480C524.159973144531,480,507.359985351563,467.519989013672,507.359985351563,442.080017089844L507.359985351563,212.160003662109C507.359985351563,186.240020751953,524.159973144531,173.279998779297,557.279968261719,173.279998779297z M755.519958496094,173.279998779297L855.359985351563,173.279998779297 855.359985351563,192.959991455078C872.159973144531,180 897.119995117188,173.279998779297 929.760009765625,173.279998779297 962.880004882813,173.279998779297 979.679992675781,186.240020751953 979.679992675781,212.160003662109L979.679992675781,480 879.839965820313,480 879.839965820313,251.040008544922C879.839965820313,250.559997558594,879.359985351563,250.080001831055,878.880004882813,250.080001831055L856.319946289063,250.080001831055C855.839965820313,250.080001831055,855.359985351563,250.559997558594,855.359985351563,251.040008544922L855.359985351563,480 755.519958496094,480 755.519958496094,173.279998779297z M1211.03991699219,355.679992675781C1210.55993652344,355.679992675781,1210.07995605469,356.160003662109,1210.07995605469,356.640014648438L1210.07995605469,402.720001220703C1210.07995605469,403.200012207031,1210.55993652344,403.679992675781,1211.03991699219,403.679992675781L1234.55993652344,403.679992675781 1234.55993652344,355.679992675781 1211.03991699219,355.679992675781z M1160.15991210938,173.279998779297L1284.47998046875,173.279998779297C1317.59997558594,173.279998779297,1334.39990234375,186.240020751953,1334.39990234375,212.160003662109L1334.39990234375,480 1160.15991210938,480C1127.03991699219,480,1110.23999023438,467.519989013672,1110.23999023438,442.080017089844L1110.23999023438,326.400024414063C1110.23999023438,300.960021972656,1127.03991699219,288.480010986328,1160.15991210938,288.480010986328L1234.55993652344,288.480010986328 1234.55993652344,251.040008544922C1234.55993652344,250.559997558594,1234.07995605469,250.080001831055,1233.59997558594,250.080001831055L1211.03991699219,250.080001831055C1210.55993652344,250.080001831055,1210.07995605469,250.559997558594,1210.07995605469,251.040008544922L1210.07995605469,268.799987792969 1110.23999023438,268.799987792969 1110.23999023438,212.160003662109C1110.23999023438,186.240020751953,1127.03991699219,173.279998779297,1160.15991210938,173.279998779297z M1707.35998535156,250.080001831055C1706.88000488281,250.080001831055,1706.40002441406,250.559997558594,1706.40002441406,251.040008544922L1706.40002441406,402.720001220703C1706.40002441406,403.200012207031,1706.88000488281,403.679992675781,1707.35998535156,403.679992675781L1730.88000488281,403.679992675781 1730.88000488281,250.080001831055 1707.35998535156,250.080001831055z M1358.88000488281,173.279998779297L1458.71997070313,173.279998779297 1458.71997070313,192.959991455078C1475.52001953125,180 1500.47998046875,173.279998779297 1533.11999511719,173.279998779297 1566.23999023438,173.279998779297 1583.0400390625,186.240020751953 1583.0400390625,212.160003662109L1583.0400390625,498.239990234375C1583.0400390625,498.720001220703,1583.52001953125,499.200012207031,1584,499.200012207031L1830.71997070313,499.200012207031 1830.71997070313,575.52001953125 1533.59997558594,575.52001953125C1500,575.52001953125,1483.20007324219,563.039978027344,1483.20007324219,537.599975585938L1483.20007324219,251.040008544922C1483.20007324219,250.559997558594,1482.71997070313,250.080001831055,1482.23999023438,250.080001831055L1459.68005371094,250.080001831055C1459.20007324219,250.080001831055,1458.71997070313,250.559997558594,1458.71997070313,251.040008544922L1458.71997070313,480 1358.88000488281,480 1358.88000488281,173.279998779297z M1730.88000488281,96.4800109863281L1830.71997070313,96.4800109863281 1830.71997070313,480 1656.47998046875,480C1621.92004394531,480,1606.56005859375,467.519989013672,1606.56005859375,442.080017089844L1606.56005859375,212.160003662109C1606.56005859375,186.240020751953,1623.35998535156,173.279998779297,1656.47998046875,173.279998779297L1730.88000488281,173.279998779297 1730.88000488281,96.4800109863281z M2012.16003417969,173.279998779297L2149.43994140625,173.279998779297 2149.43994140625,250.080001831055 2063.0400390625,250.080001831055C2062.56005859375,250.080001831055,2062.080078125,250.559997558594,2062.080078125,251.040008544922L2062.080078125,268.799987792969 2148.47998046875,268.799987792969 2148.47998046875,345.600006103516 2062.080078125,345.600006103516 2062.080078125,480 1962.23999023438,480 1962.23999023438,212.160003662109C1962.23999023438,186.720001220703,1979.0400390625,173.279998779297,2012.16003417969,173.279998779297z M2393.759765625,250.080001831055C2393.27978515625,250.080001831055,2392.7998046875,250.559997558594,2392.7998046875,251.040008544922L2392.7998046875,402.720001220703C2392.7998046875,403.200012207031,2393.27978515625,403.679992675781,2393.759765625,403.679992675781L2416.31982421875,403.679992675781C2416.7998046875,403.679992675781,2417.27978515625,403.200012207031,2417.27978515625,402.720001220703L2417.27978515625,251.040008544922C2417.27978515625,250.559997558594,2416.7998046875,250.080001831055,2416.31982421875,250.080001831055L2393.759765625,250.080001831055z M2342.8798828125,173.279998779297L2467.19995117188,173.279998779297C2500.31982421875,173.279998779297,2517.11987304688,186.240020751953,2517.11987304688,212.160003662109L2517.11987304688,442.080017089844C2517.11987304688,467.519989013672,2500.31982421875,480,2467.19995117188,480L2342.8798828125,480C2309.759765625,480,2292.9599609375,467.519989013672,2292.9599609375,442.080017089844L2292.9599609375,212.160003662109C2292.9599609375,186.240020751953,2309.759765625,173.279998779297,2342.8798828125,173.279998779297z M2169.11987304688,173.279998779297L2268.9599609375,173.279998779297 2268.9599609375,499.200012207031 2517.11987304688,499.200012207031 2517.11987304688,575.52001953125 2169.11987304688,575.52001953125 2169.11987304688,173.279998779297z M2889.59985351563,355.679992675781C2889.11987304688,355.679992675781,2888.63989257813,356.160003662109,2888.63989257813,356.640014648438L2888.63989257813,402.720001220703C2888.63989257813,403.200012207031,2889.11987304688,403.679992675781,2889.59985351563,403.679992675781L2913.11987304688,403.679992675781 2913.11987304688,355.679992675781 2889.59985351563,355.679992675781z M2640.9599609375,250.080001831055L2640.9599609375,296.160003662109 2664.47998046875,296.160003662109C2664.9599609375,296.160003662109,2665.43994140625,295.679992675781,2665.43994140625,295.200012207031L2665.43994140625,251.040008544922C2665.43994140625,250.559997558594,2664.9599609375,250.080001831055,2664.47998046875,250.080001831055L2640.9599609375,250.080001831055z M2838.71997070313,173.279998779297L2963.03979492188,173.279998779297C2996.15991210938,173.279998779297,3012.9599609375,186.240020751953,3012.9599609375,212.160003662109L3012.9599609375,480 2838.71997070313,480C2805.59985351563,480,2788.7998046875,467.519989013672,2788.7998046875,442.080017089844L2788.7998046875,326.400024414063C2788.7998046875,300.960021972656,2805.59985351563,288.480010986328,2838.71997070313,288.480010986328L2913.11987304688,288.480010986328 2913.11987304688,251.040008544922C2913.11987304688,250.559997558594,2912.63989257813,250.080001831055,2912.15991210938,250.080001831055L2889.59985351563,250.080001831055C2889.11987304688,250.080001831055,2888.63989257813,250.559997558594,2888.63989257813,251.040008544922L2888.63989257813,268.799987792969 2788.7998046875,268.799987792969 2788.7998046875,212.160003662109C2788.7998046875,186.240020751953,2805.59985351563,173.279998779297,2838.71997070313,173.279998779297z M2541.11987304688,173.279998779297L2715.35986328125,173.279998779297C2748.47998046875,173.279998779297,2764.7998046875,186.240020751953,2764.7998046875,212.160003662109L2764.7998046875,301.440002441406C2764.7998046875,316.320007324219 2756.63989257813,324.480010986328 2740.31982421875,326.400024414063 2757.11987304688,328.799987792969 2765.27978515625,336.960021972656 2765.27978515625,351.839996337891L2765.27978515625,498.239990234375C2765.27978515625,498.720001220703,2765.759765625,499.200012207031,2766.23999023438,499.200012207031L3012.9599609375,499.200012207031 3012.9599609375,575.52001953125 2715.35986328125,575.52001953125C2682.23999023438,575.52001953125,2665.43994140625,563.039978027344,2665.43994140625,537.599975585938L2665.43994140625,358.080017089844C2665.43994140625,357.600006103516,2664.9599609375,357.119995117188,2664.47998046875,357.119995117188L2640.9599609375,357.119995117188 2640.9599609375,480 2541.11987304688,480 2541.11987304688,173.279998779297z M3211.19995117188,173.279998779297L3335.52001953125,173.279998779297C3368.63989257813,173.279998779297,3385.43994140625,186.240020751953,3385.43994140625,212.160003662109L3385.43994140625,268.799987792969 3285.59985351563,268.799987792969 3285.59985351563,251.040008544922C3285.59985351563,250.559997558594,3285.11987304688,250.080001831055,3284.63989257813,250.080001831055L3262.080078125,250.080001831055C3261.59985351563,250.080001831055,3261.11987304688,250.559997558594,3261.11987304688,251.040008544922L3261.11987304688,287.52001953125C3261.11987304688,288,3261.59985351563,288.480010986328,3262.080078125,288.480010986328L3335.52001953125,288.480010986328C3368.63989257813,288.480010986328,3385.43994140625,300.960021972656,3385.43994140625,326.400024414063L3385.43994140625,442.080017089844C3385.43994140625,467.519989013672,3368.63989257813,480,3335.52001953125,480L3211.19995117188,480C3178.080078125,480,3161.28002929688,467.519989013672,3161.28002929688,442.080017089844L3161.28002929688,384.480010986328 3261.11987304688,384.480010986328 3261.11987304688,402.720001220703C3261.11987304688,403.200012207031,3261.59985351563,403.679992675781,3262.080078125,403.679992675781L3284.63989257813,403.679992675781C3285.11987304688,403.679992675781,3285.59985351563,403.200012207031,3285.59985351563,402.720001220703L3285.59985351563,366.239990234375C3285.59985351563,365.760009765625,3285.11987304688,365.279998779297,3284.63989257813,365.279998779297L3211.19995117188,365.279998779297C3178.080078125,365.279998779297,3161.28002929688,352.320007324219,3161.28002929688,326.400024414063L3161.28002929688,212.160003662109C3161.28002929688,186.240020751953,3178.080078125,173.279998779297,3211.19995117188,173.279998779297z M3037.43994140625,173.279998779297L3137.28002929688,173.279998779297 3137.28002929688,499.200012207031 3385.43994140625,499.200012207031 3385.43994140625,575.52001953125 3037.43994140625,575.52001953125 3037.43994140625,173.279998779297z"></path>
+</g>
+</defs>
+<use href="#t-dress-word" style="fill: url(#t-dress-grad); stroke: url(#t-dress-grad); stroke-width: 100; stroke-linejoin: round"></use>
+<use href="#t-dress-word" style="fill: #000000; stroke: #000000; stroke-width: 45; stroke-linejoin: round"></use>
+<use href="#t-dress-word" style="fill: #ffffff; stroke: #ffffff; stroke-width: 5; stroke-linejoin: round"></use>
+</svg></h1>
+  </section>
+  <div class="dress-intro">
+    <p class="script dress-lead">Dress to take on 2027.</p>
+    <p class="fine-print">These are suggestions, not requirements. Nobody gets turned away for khakis. We will, however, notice.</p>
+  </div>
+
+  <div class="grid2 lookbook">
+    <section class="card look-card">
+      <img class="look-img" src="assets/img/looks/the-look.jpg" width="800" height="1000" loading="lazy" decoding="async" alt="A guy at a neon beach kiosk at night in a loud anthurium-print shirt over a white tank, peach linen shorts, a gold chain, white sneakers and sunglasses pushed up.">
+      <div class="look-body">
+        <span class="label">The look</span>
+        <ul class="chips">
+          <li>Loud florals</li><li>Neon brights</li><li>Pastel suits</li><li>Hawaiian shirts</li>
+          <li>Aviators after dark</li><li>Gold chains</li><li>Linen and white sneakers</li>
+        </ul>
+      </div>
+    </section>
+    <section class="card look-card">
+      <img class="look-img" src="assets/img/looks/palette.jpg" width="800" height="1000" loading="lazy" decoding="async" alt="A woman on a boardwalk at night in a magenta and teal windbreaker, violet bike shorts and chunky sneakers, a duffel of flower-print cash over her shoulder.">
+      <div class="look-body">
+        <span class="label">Palette</span>
+        <ul class="swatches" aria-label="Party colors">
+          <li><span style="background: #3b146b"></span>Deep violet</li>
+          <li><span style="background: #c9349b"></span>Magenta</li>
+          <li><span style="background: #f36a78"></span>Coral pink</li>
+          <li><span style="background: #ff9b55"></span>Orange</li>
+          <li><span style="background: #ffb458"></span>Warm yellow</li>
+          <li><span style="background: #4fefdc"></span>Neon teal</li>
+        </ul>
+      </div>
+    </section>
+    <section class="card look-card">
+      <img class="look-img" src="assets/img/looks/bonus.jpg" width="800" height="1000" loading="lazy" decoding="async" alt="Two getaway partners at sunset in matching tropical-print shirts, one holding car keys and one on a flip phone, a yellow convertible behind them.">
+      <div class="look-body">
+        <span class="label">Bonus points</span>
+        <ul class="tips">
+          <li>Coordinate with your getaway partner.</li>
+          <li>Glow sticks and light-up anything.</li>
+          <li>A prop from the job: duffel bag, fake cash, burner phone.</li>
+        </ul>
+      </div>
+    </section>
+    <section class="card look-card">
+      <img class="look-img" src="assets/img/looks/practical.jpg" width="800" height="1000" loading="lazy" decoding="async" alt="A woman at golden hour in a relaxed mint linen suit with the sleeves pushed up, a coral tee, aviators and comfortable loafers.">
+      <div class="look-body">
+        <span class="label">Keep it practical</span>
+        <p style="margin: 0">It's a late night on your feet, so wear shoes you can stand in until 2027. Bring a layer for the walk in: it's Texas in December.</p>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ================= DRINKS ================= -->
+<section class="view page" id="view-drinks" aria-label="Drink list" hidden>
+  <section class="banner">
     <p class="script">The drink list</p>
-    <h2 class="title-wrap"><svg viewBox="-91 -91 5875 1248" role="img" aria-label="Supply run" class="title-art" style="overflow: visible">
+    <h1 class="title-wrap"><svg viewBox="-91 -91 5875 1248" role="img" aria-label="Supply run" class="title-art" style="overflow: visible">
 <defs>
 <linearGradient id="t-supply-grad" x1="0" y1="0" x2="1" y2="1">
 <stop offset="0" style="stop-color: var(--art-4)"></stop>
@@ -100,60 +208,243 @@
 <use href="#t-supply-word" style="fill: url(#t-supply-grad); stroke: url(#t-supply-grad); stroke-width: 170; stroke-linejoin: round"></use>
 <use href="#t-supply-word" style="fill: #000000; stroke: #000000; stroke-width: 75; stroke-linejoin: round"></use>
 <use href="#t-supply-word" style="fill: #ffffff; stroke: #ffffff; stroke-width: 9; stroke-linejoin: round"></use>
-</svg></h2>
+</svg></h1>
   </section>
-  <p style="margin: 0; font-size: 21px; line-height: 30px">Every drink here is from the game. Tap one to claim it, then bring its real-world twin.</p>
   <p class="status err" id="board-status" role="status"></p>
 
-  <div class="grid2">
-    <div class="card">
-      <h2><span class="pd" role="img" aria-label="Beer" style="width: 88px; height: 29px; -webkit-mask-image: url('assets/headers/08-beer.svg'); mask-image: url('assets/headers/08-beer.svg')"></span></h2>
-      <ul class="drink-list" data-category="beer"></ul>
+  <section class="card crew-card" aria-labelledby="crew-h">
+    <div class="crew-head">
+      <h2 id="crew-h" class="label" style="margin: 0">The crew</h2>
+      <button class="btn mylist-btn" type="button" id="mylist-open" aria-haspopup="dialog" hidden><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"></path></svg>My list <span class="mylist-count" id="mylist-count">0</span></button>
     </div>
-    <div class="card">
-      <h2><span class="pd" role="img" aria-label="No-proof" style="width: 162px; height: 38px; -webkit-mask-image: url('assets/headers/09-no-proof.svg'); mask-image: url('assets/headers/09-no-proof.svg')"></span></h2>
-      <ul class="drink-list" data-category="noproof"></ul>
-    </div>
-  </div>
-  <div class="card">
-    <h2><span class="pd" role="img" aria-label="Liquor" style="width: 110px; height: 38px; -webkit-mask-image: url('assets/headers/10-liquor.svg'); mask-image: url('assets/headers/10-liquor.svg')"></span></h2>
-    <ul class="drink-list" data-category="liquor"></ul>
-  </div>
+    <p class="heading" id="crew-line" style="margin: 0">Nobody's claimed anything yet</p>
+    <ul class="crew-people" id="crew-names" aria-label="Who is bringing what"></ul>
+    <div class="ready-bar" id="ready-bar" role="img" aria-label="0 of 8 drinks ready to pour"><div class="ready-fill" id="ready-fill"></div><div class="ready-knob" id="ready-knob"></div></div>
+    <p class="small muted" id="ready-text" style="margin: 0">0 of 8 drinks ready to pour</p>
+  </section>
 
-  <section class="card" aria-labelledby="writein-h">
-    <h2 id="writein-h" style="line-height: 30px; font-size: 24px; font-weight: 600">Not on the list?</h2>
-    <p class="muted" style="margin: 0">Bringing something else? Add it so nobody doubles up.</p>
-    <form id="writein-form" class="row" novalidate>
-      <div class="field grow"><label class="label" for="wi-name">Your name</label><input id="wi-name" maxlength="40" autocomplete="name" required></div>
-      <div class="field grow"><label class="label" for="wi-item">What you're bringing</label><input id="wi-item" maxlength="60" required></div>
-      <button class="btn btn-primary" type="submit">Add it</button>
-    </form>
-    <p class="status" id="writein-status" role="status"></p>
-    <div id="writein-wrap" hidden>
-      <p class="label" style="margin: 4px 0 6px">Also coming</p>
-      <ul class="writeins" id="writein-list"></ul>
+  <section class="jobs" aria-labelledby="jobs-h">
+    <div class="jobs-head">
+      <h2 id="jobs-h" class="label" style="margin: 0">Tonight's jobs</h2>
+      <p class="small muted" style="margin: 0">Tap everything you'll bring, then hit Bring these at the bottom. Already claimed? You can still bring some too. We've got the ice.</p>
+    </div>
+    <div class="jobs-list grid2" id="jobs"></div>
+  </section>
+
+  <section class="also" aria-labelledby="also-h">
+    <h2 id="also-h" class="label" style="margin: 0">Also on the list</h2>
+    <div class="grid2 also-grid">
+    <article class="card also-card" aria-labelledby="beer-h">
+      <h3 id="beer-h" class="sr-only">Beer</h3>
+      <button type="button" class="big-btn beer-art" id="beer-open" aria-label="Bring beer">
+        <img class="beer-photo" src="assets/img/drinks/beer.jpg" alt="" loading="lazy" decoding="async">
+        <span class="beer-over">
+          <span class="big-btn-text">
+            <span class="pd" aria-hidden="true" style="width: 123px; height: 41px; -webkit-mask-image: url('assets/headers/08-beer.svg'); mask-image: url('assets/headers/08-beer.svg')"></span>
+            <span class="small">Tap to add your name.</span>
+          </span>
+          <span class="big-btn-plus" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span>
+        </span>
+      </button>
+      <div class="roster">
+        <p class="roster-count" id="beer-count">Nobody's on beer yet. Be the first.</p>
+        <ul class="roster-list" id="beer-list"></ul>
+      </div>
+    </article>
+
+    <article class="card also-card" aria-labelledby="wi-h">
+      <button type="button" class="big-btn beer-art" id="wi-open" aria-haspopup="dialog" aria-labelledby="wi-h">
+        <img class="beer-photo art-day" src="assets/img/drinks/something-else-day.jpg" alt="" loading="lazy" decoding="async">
+        <img class="beer-photo art-night" src="assets/img/drinks/something-else-night.jpg" alt="" loading="lazy" decoding="async">
+        <span class="beer-over">
+          <span class="big-btn-text">
+            <span class="drink-name also-title" id="wi-h">Something else?</span>
+            <span class="small">Snacks, wine, dessert. Add it so nobody doubles up.</span>
+          </span>
+          <span class="big-btn-plus" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span>
+        </span>
+      </button>
+      <div class="roster">
+        <p class="roster-count" id="wi-count">Nothing extra yet.</p>
+        <ul class="roster-list" id="writein-list"></ul>
+      </div>
+    </article>
     </div>
   </section>
 
-  <p class="muted" style="margin: 0; font-weight: 600">Final objective: line up a getaway driver. A sober one.</p>
+  <div id="mission-slot"></div>
+</section>
+
+<!-- ================= LOCATION ================= -->
+<section class="view page" id="view-location" aria-label="Location" hidden>
+  <section class="banner">
+    <p class="script">The safehouse</p>
+    <h1 class="title-wrap" style="width: min(300px, 60%)"><svg viewBox="-46 -46 2060 519" role="img" aria-label="Our place" class="title-art" style="overflow: visible">
+<defs>
+<linearGradient id="t-place-grad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" style="stop-color: var(--art-4)"></stop>
+<stop offset="0.5" style="stop-color: var(--art-3)"></stop>
+<stop offset="1" style="stop-color: var(--art-2)"></stop>
+</linearGradient>
+<g id="t-place-word">
+<path transform="translate(0.47999954223632813 -161.27999877929688)" fill-rule="nonzero" d="M112.319999694824,250.080001831055C111.839996337891,250.080001831055,111.360000610352,250.559997558594,111.360000610352,251.040008544922L111.360000610352,402.720001220703C111.360000610352,403.200012207031,111.839996337891,403.679992675781,112.319999694824,403.679992675781L134.879989624023,403.679992675781C135.360000610352,403.679992675781,135.839996337891,403.200012207031,135.839996337891,402.720001220703L135.839996337891,251.040008544922C135.839996337891,250.559997558594,135.360000610352,250.080001831055,134.879989624023,250.080001831055L112.319999694824,250.080001831055z M61.439998626709,173.279998779297L185.759994506836,173.279998779297C218.879989624023,173.279998779297,235.679992675781,186.240020751953,235.679992675781,212.160003662109L235.679992675781,442.080017089844C235.679992675781,467.519989013672,218.879989624023,480,185.759994506836,480L61.439998626709,480C28.3199996948242,480,11.5199995040894,467.519989013672,11.5200004577637,442.080017089844L11.5200004577637,212.160003662109C11.5199995040894,186.240020751953,28.3199996948242,173.279998779297,61.439998626709,173.279998779297z M259.200012207031,173.279998779297L359.039978027344,173.279998779297 359.039978027344,402.720001220703C359.039978027344,403.200012207031,359.519989013672,403.679992675781,360,403.679992675781L382.559997558594,403.679992675781C383.039978027344,403.679992675781,383.519989013672,403.200012207031,383.519989013672,402.720001220703L383.519989013672,173.279998779297 483.359985351563,173.279998779297 483.359985351563,442.080017089844C483.359985351563,467.519989013672,466.559997558594,480,433.440002441406,480L309.119995117188,480C276,480,259.200012207031,467.519989013672,259.200012207031,442.080017089844L259.200012207031,173.279998779297z M607.679992675781,250.080001831055L607.679992675781,296.160003662109 631.199951171875,296.160003662109C631.679992675781,296.160003662109,632.159973144531,295.679992675781,632.159973144531,295.200012207031L632.159973144531,251.040008544922C632.159973144531,250.559997558594,631.679992675781,250.080001831055,631.199951171875,250.080001831055L607.679992675781,250.080001831055z M507.839996337891,173.279998779297L682.079956054688,173.279998779297C715.199951171875,173.279998779297,731.519958496094,186.240020751953,731.519958496094,212.160003662109L731.519958496094,301.440002441406C731.519958496094,316.320007324219 723.359985351563,324.480010986328 707.039978027344,326.400024414063 723.839965820313,328.799987792969 732,336.960021972656 732,351.839996337891L732,480 632.159973144531,480 632.159973144531,358.080017089844C632.159973144531,357.600006103516,631.679992675781,357.119995117188,631.199951171875,357.119995117188L607.679992675781,357.119995117188 607.679992675781,480 507.839996337891,480 507.839996337891,173.279998779297z M962.399963378906,250.080001831055L962.399963378906,403.679992675781 985.919982910156,403.679992675781C986.399963378906,403.679992675781,986.880004882813,403.200012207031,986.880004882813,402.720001220703L986.880004882813,251.040008544922C986.880004882813,250.559997558594,986.399963378906,250.080001831055,985.919982910156,250.080001831055L962.399963378906,250.080001831055z M862.559997558594,173.279998779297L1036.79992675781,173.279998779297C1069.919921875,173.279998779297,1086.71997070313,186.240020751953,1086.71997070313,212.160003662109L1086.71997070313,442.080017089844C1086.71997070313,467.519989013672,1071.35998535156,480,1036.79992675781,480L962.399963378906,480 962.399963378906,575.52001953125 862.559997558594,575.52001953125 862.559997558594,173.279998779297z M1336.31994628906,355.679992675781C1335.83996582031,355.679992675781,1335.35998535156,356.160003662109,1335.35998535156,356.640014648438L1335.35998535156,402.720001220703C1335.35998535156,403.200012207031,1335.83996582031,403.679992675781,1336.31994628906,403.679992675781L1359.83996582031,403.679992675781 1359.83996582031,355.679992675781 1336.31994628906,355.679992675781z M1285.43994140625,173.279998779297L1409.76000976563,173.279998779297C1442.8798828125,173.279998779297,1459.67993164063,186.240020751953,1459.67993164063,212.160003662109L1459.67993164063,480 1285.43994140625,480C1252.31994628906,480,1235.51989746094,467.519989013672,1235.51989746094,442.080017089844L1235.51989746094,326.400024414063C1235.51989746094,300.960021972656,1252.31994628906,288.480010986328,1285.43994140625,288.480010986328L1359.83996582031,288.480010986328 1359.83996582031,251.040008544922C1359.83996582031,250.559997558594,1359.35998535156,250.080001831055,1358.8798828125,250.080001831055L1336.31994628906,250.080001831055C1335.83996582031,250.080001831055,1335.35998535156,250.559997558594,1335.35998535156,251.040008544922L1335.35998535156,268.799987792969 1235.51989746094,268.799987792969 1235.51989746094,212.160003662109C1235.51989746094,186.240020751953,1252.31994628906,173.279998779297,1285.43994140625,173.279998779297z M1111.67993164063,173.279998779297L1211.51989746094,173.279998779297 1211.51989746094,499.200012207031 1459.67993164063,499.200012207031 1459.67993164063,575.52001953125 1111.67993164063,575.52001953125 1111.67993164063,173.279998779297z M1533.11999511719,173.279998779297L1657.44006347656,173.279998779297C1690.56005859375,173.279998779297,1707.36010742188,186.240020751953,1707.36010742188,212.160003662109L1707.36010742188,302.880004882813 1607.52001953125,302.880004882813 1607.52001953125,251.040008544922C1607.52001953125,250.559997558594,1607.0400390625,250.080001831055,1606.56005859375,250.080001831055L1584,250.080001831055C1583.52001953125,250.080001831055,1583.0400390625,250.559997558594,1583.0400390625,251.040008544922L1583.0400390625,402.720001220703C1583.0400390625,403.200012207031,1583.52001953125,403.679992675781,1584,403.679992675781L1606.56005859375,403.679992675781C1607.0400390625,403.679992675781,1607.52001953125,403.200012207031,1607.52001953125,402.720001220703L1607.52001953125,331.200012207031 1707.36010742188,331.200012207031 1707.36010742188,442.080017089844C1707.36010742188,467.519989013672,1690.56005859375,480,1657.44006347656,480L1533.11999511719,480C1500,480,1483.20007324219,467.519989013672,1483.20007324219,442.080017089844L1483.20007324219,212.160003662109C1483.20007324219,186.240020751953,1500,173.279998779297,1533.11999511719,173.279998779297z M1831.19995117188,250.080001831055C1830.71997070313,250.080001831055,1830.23999023438,250.559997558594,1830.23999023438,251.040008544922L1830.23999023438,293.760009765625 1854.71997070313,293.760009765625 1854.71997070313,251.040008544922C1854.71997070313,250.559997558594,1854.23999023438,250.080001831055,1853.76000976563,250.080001831055L1831.19995117188,250.080001831055z M1780.31994628906,173.279998779297L1904.64001464844,173.279998779297C1937.76000976563,173.279998779297,1954.56005859375,186.240020751953,1954.56005859375,212.160003662109L1954.56005859375,365.279998779297 1830.23999023438,365.279998779297 1830.23999023438,402.720001220703C1830.23999023438,403.200012207031,1830.71997070313,403.679992675781,1831.19995117188,403.679992675781L1853.76000976563,403.679992675781C1854.23999023438,403.679992675781,1854.71997070313,403.200012207031,1854.71997070313,402.720001220703L1854.71997070313,384.480010986328 1954.56005859375,384.480010986328 1954.56005859375,442.080017089844C1954.56005859375,467.519989013672,1937.76000976563,480,1904.64001464844,480L1780.31994628906,480C1747.19995117188,480,1730.40002441406,467.519989013672,1730.40002441406,442.080017089844L1730.40002441406,212.160003662109C1730.40002441406,186.240020751953,1747.19995117188,173.279998779297,1780.31994628906,173.279998779297z"></path>
+</g>
+</defs>
+<use href="#t-place-word" style="fill: url(#t-place-grad); stroke: url(#t-place-grad); stroke-width: 80; stroke-linejoin: round"></use>
+<use href="#t-place-word" style="fill: #000000; stroke: #000000; stroke-width: 35; stroke-linejoin: round"></use>
+<use href="#t-place-word" style="fill: #ffffff; stroke: #ffffff; stroke-width: 4; stroke-linejoin: round"></use>
+</svg></h1>
+  </section>
+
+  <section class="card art-card place-art place-art-tall">
+    <span class="art-bg" role="img" aria-label="A red-brick apartment building at golden hour under a big shade tree, with a black hatchback parked out front and a porch full of flowers."></span>
+    <div class="look-body art-body">
+      <span class="label">Address</span>
+      <p style="margin: 0; font-size: 20px; line-height: 28px" id="address-text">1117 E Vandergriff Dr, Apt 1423<br>Carrollton, TX 75006</p>
+      <dl class="arrive-info">
+        <div><dt>Gate code</dt><dd><strong>164577#</strong></dd></div>
+        <div><dt>Parking</dt><dd>Along the curb, or in the parking garage to the west.</dd></div>
+      </dl>
+      <div class="row">
+        <button class="btn" type="button" id="copy-address">Copy address</button>
+        <span class="status" id="copy-status" role="status"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="map-wrap" id="map-wrap">
+    <iframe id="map-frame" title="Map to 1117 E Vandergriff Dr, Carrollton" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+      src="https://maps.google.com/maps?q=32.951495499648416,-96.90495713160527&amp;z=17&amp;output=embed"></iframe>
+    <p class="map-fallback" id="map-fallback" hidden>The map shows on the live site. Use the buttons below for directions.</p>
+  </div>
+
+  <section class="card side-art-card directions-art">
+    <span class="sr-only">A guy in a straw hat and floral shirt staring wide-eyed at an unfolded paper map in his car.</span>
+    <span class="label">Get directions</span>
+    <div class="nav-buttons">
+      <a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=32.951495499648416,-96.90495713160527&amp;travelmode=driving" target="_blank" rel="noopener">Google Maps</a>
+      <a class="btn" href="https://maps.apple.com/?daddr=32.951495499648416,-96.90495713160527&amp;dirflg=d" target="_blank" rel="noopener">Apple Maps</a>
+      <a class="btn" href="https://waze.com/ul?ll=32.951495499648416,-96.90495713160527&amp;navigate=yes" target="_blank" rel="noopener">Waze</a>
+    </div>
+  </section>
+</section>
+
 </main>
 
-<dialog id="claim-dialog" aria-labelledby="claim-title">
-  <form method="dialog" id="claim-form" novalidate>
-    <p class="label" id="claim-title" style="margin: 0">Claim this drink</p>
-    <div id="claim-art"></div>
-    <p class="muted small" style="margin: 0" id="claim-bring"></p>
-    <div class="field"><label class="label" for="claim-name">Your name</label><input id="claim-name" maxlength="40" autocomplete="name" required></div>
-    <p class="status" id="claim-status" role="status"></p>
-    <div class="dialog-actions">
-      <button class="btn btn-quiet" type="button" id="claim-cancel">Cancel</button>
-      <button class="btn btn-primary" type="submit" id="claim-submit">I'll bring it</button>
-    </div>
-  </form>
+<div class="pick-tray" id="pick-tray" role="region" aria-label="Your picks" hidden>
+  <span class="pick-count" id="pick-count" aria-live="polite">2 picked</span>
+  <button class="btn btn-quiet pick-discard" type="button" id="pick-discard">Discard</button>
+  <button class="btn btn-primary pick-commit" type="button" id="pick-commit">Bring these</button>
+</div>
+<nav class="tabbar" aria-label="Sections">
+  <a href="#home" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path></svg><span>Home</span></a>
+  <a href="#dress-code" data-tab="dress-code"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h20"></path><path d="M3.5 10l1 5a3 3 0 0 0 3 2.5h1a3 3 0 0 0 3-2.6l.5-3"></path><path d="M20.5 10l-1 5a3 3 0 0 1-3 2.5h-1a3 3 0 0 1-3-2.6l-.5-3"></path></svg><span>Dress code</span></a>
+  <button type="button" class="tab-rsvp" data-open-rsvp><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l8 5 8-5"></path><rect x="3" y="5" width="18" height="14" rx="2"></rect></svg><span id="tab-rsvp-label">RSVP</span></button>
+  <a href="#drinks" data-tab="drinks"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"></path><path d="M12 13v7"></path><path d="M8.5 21h7"></path></svg><span>Drinks</span></a>
+  <a href="#location" data-tab="location"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg><span>Location</span></a>
+</nav>
+</div>
+
+<dialog id="mylist-dialog" class="bring-dialog" aria-labelledby="mylist-title">
+  <div class="dialog-body">
+    <p class="drink-name" id="mylist-title" style="font-size: 32px; line-height: 38px">My list</p>
+    <p class="muted" id="mylist-who" style="margin: 0"></p>
+    <ul class="run-list" id="mylist-items"></ul>
+    <p class="small muted" id="mylist-swap" style="margin: 0">Need to swap something? Text Sean at (214) 585-3256.</p>
+    <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Got it</button></div>
+  </div>
 </dialog>
 
-<script src="config.js"></script>
-<script src="shared.js"></script>
-<script src="app.js"></script>
+<dialog id="supply-dialog" class="bring-dialog" aria-labelledby="supply-title">
+  <form id="supply-form" class="dialog-body" novalidate>
+    <p class="drink-name" id="supply-title" style="font-size: 32px; line-height: 38px">Your supply run</p>
+    <ul class="run-list" id="supply-list"></ul>
+    <div class="field"><label class="label" for="supply-name">Your name</label><input id="supply-name" maxlength="40" autocomplete="given-name" placeholder="First name works"></div>
+    <p class="status" id="supply-status" role="status"></p>
+    <div class="dialog-actions"><button class="btn btn-quiet" type="button" data-close>Keep picking</button><button class="btn btn-primary" type="submit" id="supply-submit">I'll bring these</button></div>
+  </form>
+  <div id="supply-done" class="dialog-body done" hidden>
+    <p class="drink-name" style="font-size: 32px; line-height: 38px">You're on it</p>
+    <p id="supply-done-text" style="margin: 0"></p>
+    <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="beer-dialog" class="bring-dialog" aria-labelledby="beer-title">
+  <form id="beer-form" class="dialog-body" novalidate>
+    <h2 id="beer-title" style="margin: 0; line-height: 0"><span class="pd" role="img" aria-label="Beer" style="width: 88px; height: 29px; -webkit-mask-image: url('assets/headers/08-beer.svg'); mask-image: url('assets/headers/08-beer.svg')"></span></h2>
+    <div class="field"><label class="label" for="beer-name">Your name</label><input id="beer-name" maxlength="40" autocomplete="given-name" placeholder="First name works"></div>
+    <div class="field"><label class="label" for="beer-note">Comments (optional)</label><textarea id="beer-note" maxlength="120" rows="3" placeholder="What you're bringing, like a 12-pack of Modelo"></textarea></div>
+    <p class="status" id="beer-status" role="status"></p>
+    <div class="dialog-actions"><button class="btn btn-quiet" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit" id="beer-submit">I'll bring beer</button></div>
+  </form>
+  <div id="beer-done" class="dialog-body done" hidden>
+    <p class="drink-name" style="font-size: 32px; line-height: 38px">Cold ones, locked in</p>
+    <p id="beer-done-text" style="margin: 0">You're on the beer list.</p>
+    <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="wi-dialog" class="bring-dialog" aria-labelledby="wi-title">
+  <form id="writein-form" class="dialog-body" novalidate>
+    <p class="drink-name" id="wi-title" style="font-size: 32px; line-height: 38px">Bringing something else?</p>
+    <p class="muted" style="margin: 0">Add it so nobody doubles up.</p>
+    <div class="field"><label class="label" for="wi-item">What you're bringing</label><input id="wi-item" maxlength="60" placeholder="Snacks, wine, dessert, anything"></div>
+    <div class="field"><label class="label" for="wi-name">Your name</label><input id="wi-name" maxlength="40" autocomplete="given-name"></div>
+    <p class="status" id="writein-status" role="status"></p>
+    <div class="dialog-actions"><button class="btn btn-quiet" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit" id="wi-submit">Add it</button></div>
+  </form>
+  <div id="wi-done" class="dialog-body done" hidden>
+    <p class="drink-name" style="font-size: 32px; line-height: 38px">Added</p>
+    <p id="wi-done-text" style="margin: 0"></p>
+    <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="rsvp-dialog" aria-labelledby="rsvp-dialog-title">
+  <div id="rsvp-step-form" class="dialog-body">
+    <p class="label" id="rsvp-dialog-title" style="margin: 0">RSVP</p>
+    <button type="button" class="link-btn" id="rsvp-new" hidden>RSVP for someone else instead</button>
+    <span class="pd" role="img" aria-label="RSVP by Sat, Dec 26" style="width: 219px; height: 27px; -webkit-mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg'); mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg')"></span>
+    <form id="rsvp-form" class="row" novalidate>
+      <div class="field grow"><label class="label" for="rsvp-name">Your name</label><input id="rsvp-name" maxlength="40" autocomplete="name" required></div>
+      <div class="field" style="width: 110px"><label class="label" for="rsvp-size">Coming</label>
+        <select id="rsvp-size"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+      <fieldset id="rsvp-guests" class="guests"><legend class="label">Who's with you (optional)</legend><div id="rsvp-guest-fields" class="guest-fields"></div></fieldset>
+      <div class="field" style="flex: 1 1 100%"><label class="label" for="rsvp-note">Note (optional)</label><input id="rsvp-note" maxlength="200"></div>
+      <div class="dialog-actions" style="flex: 1 1 100%"><button class="btn btn-quiet" type="button" id="rsvp-cancel" hidden>Can't make it</button><button class="btn btn-quiet" type="button" data-close-rsvp>Close</button><button class="btn btn-primary" type="submit" id="rsvp-submit">Send my RSVP</button></div>
+    </form>
+    <p class="status" id="rsvp-status" role="status"></p>
+  </div>
+  <div id="rsvp-step-confirm" class="dialog-body done" hidden>
+    <p class="script" style="font-size: 34px; line-height: 40px">Bail on the job?</p>
+    <p style="margin: 0" id="rsvp-confirm-text">This takes you off the crew list.</p>
+    <p class="status" id="rsvp-confirm-status" role="status"></p>
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="rsvp-confirm-keep">Keep my spot</button>
+      <button class="btn btn-primary" type="button" id="rsvp-confirm-yes">Yes, cancel</button>
+    </div>
+  </div>
+  <div id="rsvp-step-done" class="dialog-body done" hidden>
+    <svg width="126" height="22" viewBox="0 0 126 22" aria-hidden="true" class="done-stars" style="fill: var(--goal)">
+      <g><path d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path></g>
+      <g transform="translate(26 0)"><path d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path></g>
+      <g transform="translate(52 0)"><path d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path></g>
+      <g transform="translate(78 0)"><path d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path></g>
+      <g transform="translate(104 0)"><path d="M11 1 L13.5 7.5 L20.5 7.9 L15.1 12.3 L16.9 19.1 L11 15.3 L5.1 19.1 L6.9 12.3 L1.5 7.9 L8.5 7.5 Z"></path></g>
+    </svg>
+    <p class="mission-title" id="rsvp-done-title" role="img" aria-label="Mission accepted"><img class="art-night when-passed" src="assets/img/missions/mission-accepted-night.png" alt=""><img class="art-day when-passed" src="assets/img/missions/mission-accepted-day.png" alt=""><img class="art-night when-failed" src="assets/img/missions/mission-failed-night.png" alt=""><img class="art-day when-failed" src="assets/img/missions/mission-failed-day.png" alt=""></p>
+    <p style="margin: 0" id="rsvp-done-text"></p>
+    <div class="dialog-actions">
+      <a class="btn" href="#drinks" data-close-rsvp id="rsvp-done-drinks" style="display: inline-flex; align-items: center; text-decoration: none">Claim a drink</a>
+      <button class="btn btn-primary" type="button" data-close-rsvp>Done</button>
+    </div>
+  </div>
+</dialog>
+
+
+<script src="config.js?v=20261125e"></script>
+<script src="shared.js?v=20261125e"></script>
+<script src="app.js?v=20261125e"></script>
 </body>
 </html>

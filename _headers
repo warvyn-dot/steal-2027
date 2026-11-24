@@ -1,0 +1,10 @@
+# Cloudflare Pages: make phones re-check the page and code on every visit, so an update never
+# shows half-new, half-old (the doubled "New mission" came from a stale stylesheet).
+/*.html
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache
+/*.css
+  Cache-Control: no-cache
+/*.js
+  Cache-Control: no-cache

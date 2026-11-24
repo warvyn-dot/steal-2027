@@ -12,7 +12,8 @@ No build step, no framework: plain HTML, CSS and JavaScript.
 
 | File | What it is |
 |---|---|
-| `index.html`, `app.js` | Guest page: invite, RSVP, drink list, write-ins |
+| `index.html`, `app.js` | Guest app with four tabs: Home (invite + RSVP with plus-one names), Dress code, Drinks (claims + write-ins), Location (map + directions) |
+| `manifest.webmanifest`, `assets/icons/` | Lets guests add the site to their home screen like an app |
 | `admin.html`, `admin.js` | Crew dashboard behind the PIN |
 | `shared.js` | Database calls, theme toggle, header art |
 | `styles.css` | The Afterglow look, night and day themes |
