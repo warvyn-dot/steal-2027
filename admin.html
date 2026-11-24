@@ -7,7 +7,7 @@
 <title>Steal 2027: crew dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261125e">
+<link rel="stylesheet" href="styles.css?v=20261125f">
 </head>
 <body>
 <main class="page" style="max-width: 900px">
@@ -61,7 +61,7 @@
         <input id="host-new" maxlength="80" placeholder="Add something to your run" autocomplete="off">
         <button class="btn btn-primary" type="submit">Add</button>
       </form>
-      <h3 class="adm-sub">From the crew <span class="muted small">Checks itself as guests claim</span></h3>
+      <h3 class="adm-sub">From the crew <span class="muted small">Checks itself as guests claim. Tap a name to edit it.</span></h3>
       <ul id="crew-checks" class="check-list"></ul>
     </section>
 
@@ -84,8 +84,20 @@
     </section>
   </div>
 </main>
-<script src="config.js?v=20261125e"></script>
-<script src="shared.js?v=20261125e"></script>
-<script src="admin.js?v=20261125e"></script>
+<dialog id="edit-dialog" class="bring-dialog" aria-labelledby="edit-title">
+  <form id="edit-form" class="dialog-body" novalidate>
+    <p class="drink-name" id="edit-title" style="font-size: 32px; line-height: 38px">Edit</p>
+    <div id="edit-fields" class="edit-fields"></div>
+    <p class="status" id="edit-status" role="status"></p>
+    <div class="dialog-actions edit-actions">
+      <button class="btn btn-quiet edit-remove" type="button" id="edit-remove" hidden>Remove</button>
+      <button class="btn btn-quiet" type="button" data-close>Cancel</button>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+<script src="config.js?v=20261125f"></script>
+<script src="shared.js?v=20261125f"></script>
+<script src="admin.js?v=20261125f"></script>
 </body>
 </html>

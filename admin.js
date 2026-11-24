@@ -90,6 +90,48 @@
     } catch (e) { setStatus($("dash-status"), "Couldn't reach the server.", "err"); }
   }
 
+  // One edit dialog for everything guests type. fields: [{ key, label, value, max, type, area, hint }].
+  // save(values) returns the RPC result; remove is { label, run } and lives inside the dialog.
+  const editDlg = $("edit-dialog");
+  let editSave = null, editRemove = null;
+  editDlg.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => editDlg.close()));
+  editDlg.addEventListener("click", (e) => { if (e.target === editDlg) editDlg.close(); });
+  function openEdit(title, fields, save, remove) {
+    $("edit-title").textContent = title;
+    const box = $("edit-fields"); box.textContent = "";
+    fields.forEach((f, i) => {
+      const wrap = S.el("div", { class: "field" });
+      const id = "edit-f" + i;
+      wrap.appendChild(S.el("label", { class: "label", for: id }, f.label));
+      const inp = S.el(f.area ? "textarea" : "input", { id, "data-key": f.key, maxlength: String(f.max || 40), autocomplete: "off" });
+      if (f.type) { inp.type = f.type; inp.min = "1"; inp.max = "10"; inp.inputMode = "numeric"; }
+      inp.value = f.value == null ? "" : String(f.value);
+      wrap.appendChild(inp);
+      if (f.hint) wrap.appendChild(S.el("span", { class: "small muted" }, f.hint));
+      box.appendChild(wrap);
+    });
+    editSave = save; editRemove = remove || null;
+    const rb = $("edit-remove");
+    rb.hidden = !remove; if (remove) rb.textContent = remove.label;
+    setStatus($("edit-status"), "");
+    editDlg.showModal();
+    const first = box.querySelector("input, textarea"); if (first) first.focus();
+  }
+  const EDIT_ERRORS = { bad_size: "How many has to be 1 to 10.", too_many: "More names than that party size. Raise How many or remove a name.", invalid: "Check the fields: something's empty or too long.", already: "That person already has this one.", not_found: "That entry is gone. Refresh the page." };
+  $("edit-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const vals = {};
+    $("edit-fields").querySelectorAll("[data-key]").forEach((x) => { vals[x.dataset.key] = x.value; });
+    setStatus($("edit-status"), "Saving...");
+    try {
+      const r = await editSave(vals);
+      if (r !== "ok") { setStatus($("edit-status"), EDIT_ERRORS[r] || MESSAGES[r] || "That didn't work.", "err"); return; }
+      editDlg.close();
+      await load();
+    } catch (e) { setStatus($("edit-status"), "Couldn't reach the server.", "err"); }
+  });
+  $("edit-remove").addEventListener("click", async () => { if (!editRemove) return; editDlg.close(); await editRemove.run(); });
+
   function renderRun(d) {
     const host = d.host_items || [], sup = d.supplies || [];
     const hostDone = host.filter((h) => h.done).length;
@@ -132,7 +174,7 @@
     });
     if (!shown) hl.appendChild(S.el("p", { class: "adm-empty" }, host.length ? "Your run is done. Go get dressed." : "Nothing on your run yet."));
 
-    // From the crew: checks itself when anyone claims it. Tap a name to release that claim.
+    // From the crew: checks itself when anyone claims it. Tap a name to edit or release that claim.
     const cl = $("crew-checks"); cl.textContent = "";
     const rows = todo ? sup.filter((s) => !(s.claims || []).length) : sup;
     rows.forEach((s) => {
@@ -144,9 +186,11 @@
       if (has) {
         const who = S.el("span", { class: "check-who" });
         s.claims.forEach((c) => {
-          const b = S.el("button", { type: "button", class: "who-pill", "aria-label": "Release " + c.guest_name + "'s claim on " + s.name }, c.guest_name);
-          b.appendChild(S.el("span", { class: "who-x", "aria-hidden": "true" }, "×"));
-          b.addEventListener("click", () => act("admin_release_supply", c.id, "Release " + c.guest_name + "'s claim on " + s.name + "?"));
+          const b = S.el("button", { type: "button", class: "who-pill", "aria-label": "Edit or release " + c.guest_name + "'s claim on " + s.name }, c.guest_name);
+          b.addEventListener("click", () => openEdit(s.name,
+            [{ key: "name", label: "Who's bringing it", value: c.guest_name, max: 40 }],
+            (v) => S.rpc("admin_update_claim", { p_pin: pin, p_id: c.id, p_name: v.name }),
+            { label: "Release claim", run: () => act("admin_release_supply", c.id, "Release " + c.guest_name + "'s claim on " + s.name + "?") }));
           who.appendChild(b);
         });
         words.appendChild(who);
@@ -174,18 +218,35 @@
       const extra = (r.guests || []).length ? "with " + r.guests.join(", ") : (r.party_size > 1 ? "+" + (r.party_size - 1) : "");
       const sub = [extra, r.note ? "“" + r.note + "”" : "", when(r.created_at)].filter(Boolean).join(" · ");
       tr.appendChild(item(r.guest_name + (r.party_size > 1 ? "  (" + r.party_size + ")" : ""), sub,
-        { label: "Remove", run: () => act("admin_delete_rsvp", r.id, "Remove " + r.guest_name + "'s RSVP?") }));
+        { label: "Edit", run: () => openEdit("Edit RSVP", [
+            { key: "name", label: "Name", value: r.guest_name, max: 40 },
+            { key: "size", label: "How many, counting them", value: r.party_size, type: "number" },
+            { key: "guests", label: "Who they're bringing", value: (r.guests || []).join(", "), max: 400, hint: "Separate names with commas." },
+            { key: "note", label: "Note", value: r.note || "", max: 200, area: true }],
+          (v) => { const size = parseInt(v.size, 10) || 0, names = v.guests.split(",").map((x) => x.trim()).filter(Boolean);
+            if (size < 1 || size > 10) return Promise.resolve("bad_size");
+            if (names.length > size - 1) return Promise.resolve("too_many");
+            return S.rpc("admin_update_rsvp", { p_pin: pin, p_id: r.id, p_name: v.name, p_party_size: size, p_note: v.note, p_guests: names }); },
+          { label: "Remove RSVP", run: () => act("admin_delete_rsvp", r.id, "Remove " + r.guest_name + "'s RSVP?") }) }));
     });
 
     const tb = $("t-beer"); tb.textContent = "";
     if (!br.length) emptyRow(tb, "Nobody's on beer yet.");
     br.forEach((b) => tb.appendChild(item(b.guest_name, [b.note, when(b.created_at)].filter(Boolean).join(" · "),
-      { label: "Remove", run: () => act("admin_delete_beer", b.id, "Remove " + b.guest_name + " from the beer list?") })));
+      { label: "Edit", run: () => openEdit("Edit beer", [
+          { key: "name", label: "Name", value: b.guest_name, max: 40 },
+          { key: "note", label: "What they're bringing", value: b.note || "", max: 120 }],
+        (v) => S.rpc("admin_update_beer", { p_pin: pin, p_id: b.id, p_name: v.name, p_note: v.note }),
+        { label: "Remove", run: () => act("admin_delete_beer", b.id, "Remove " + b.guest_name + " from the beer list?") }) })));
 
     const tw = $("t-writeins"); tw.textContent = "";
     if (!wi.length) emptyRow(tw, "Nothing extra yet.");
     wi.forEach((w) => tw.appendChild(item(w.item, w.guest_name + " · " + when(w.created_at),
-      { label: "Remove", run: () => act("admin_delete_write_in", w.id, "Remove " + w.item + "?") })));
+      { label: "Edit", run: () => openEdit("Edit write-in", [
+          { key: "item", label: "What they're bringing", value: w.item, max: 60 },
+          { key: "name", label: "Name", value: w.guest_name, max: 40 }],
+        (v) => S.rpc("admin_update_write_in", { p_pin: pin, p_id: w.id, p_name: v.name, p_item: v.item }),
+        { label: "Remove", run: () => act("admin_delete_write_in", w.id, "Remove " + w.item + "?") }) })));
 
     // Drink prep: one tap opens a drink's real name, how to make it, and what's covered.
     const claimed = new Set((d.supplies || []).filter((s) => (s.claims || []).length).map((s) => s.id));

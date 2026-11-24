@@ -77,6 +77,18 @@
       admin_host_toggle: (a) => { if (a.p_pin !== PIN) return "bad_pin"; const h = host.find((x) => x.id === a.p_id); if (!h) return "invalid"; h.done = !h.done; return "ok"; },
       admin_host_add: (a) => { if (a.p_pin !== PIN) return "bad_pin"; const nm = (a.p_name || "").trim(); if (!nm || nm.length > 80) return "invalid";
         host.push({ id: ++n, name: nm, section: (a.p_section || "").trim() || "Extras", done: false }); return "ok"; },
+      admin_update_rsvp: (a) => { if (a.p_pin !== PIN) return "bad_pin"; const r = rsvps.find((x) => x.id === a.p_id); if (!r) return "not_found";
+        const g = (a.p_guests || []).map((x) => x.trim()).filter(Boolean); const nm = (a.p_name || "").trim();
+        if (!nm || nm.length > 40 || !(a.p_party_size >= 1 && a.p_party_size <= 10) || g.length > a.p_party_size - 1) return "invalid";
+        Object.assign(r, { guest_name: nm, party_size: a.p_party_size, note: (a.p_note || "").trim() || null, guests: g }); return "ok"; },
+      admin_update_beer: (a) => { if (a.p_pin !== PIN) return "bad_pin"; const b = beer.find((x) => x.id === a.p_id); if (!b) return "not_found";
+        const nm = (a.p_name || "").trim(); if (!nm) return "invalid"; b.guest_name = nm; b.note = (a.p_note || "").trim() || null; return "ok"; },
+      admin_update_write_in: (a) => { if (a.p_pin !== PIN) return "bad_pin"; const w = write_ins.find((x) => x.id === a.p_id); if (!w) return "not_found";
+        const nm = (a.p_name || "").trim(), it = (a.p_item || "").trim(); if (!nm || !it) return "invalid"; w.guest_name = nm; w.item = it; return "ok"; },
+      admin_update_claim: (a) => { if (a.p_pin !== PIN) return "bad_pin"; const c = claims.find((x) => x.id === a.p_id); if (!c) return "not_found";
+        const nm = (a.p_name || "").trim(); if (!nm) return "invalid";
+        if (claims.some((x) => x !== c && x.supply_id === c.supply_id && x.guest_name.toLowerCase() === nm.toLowerCase())) return "already";
+        c.guest_name = nm; return "ok"; },
       admin_host_delete: (a) => { if (a.p_pin !== PIN) return "bad_pin"; pull(host, a.p_id); return "ok"; },
       admin_release_supply: (a) => { if (a.p_pin !== PIN) return "bad_pin"; pull(claims, a.p_id); return "ok"; },
       admin_delete_beer: (a) => { if (a.p_pin !== PIN) return "bad_pin"; pull(beer, a.p_id); return "ok"; },
