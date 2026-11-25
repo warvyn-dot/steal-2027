@@ -27,7 +27,7 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261126f">
+<link rel="stylesheet" href="styles.css?v=20261126h">
 </head>
 <body>
 <div class="call" id="call" hidden aria-live="polite">
@@ -452,20 +452,35 @@
 </dialog>
 
 <dialog id="rsvp-dialog" aria-labelledby="rsvp-dialog-title">
-  <div id="rsvp-step-form" class="dialog-body">
-    <p class="label" id="rsvp-dialog-title" style="margin: 0">RSVP</p>
-    <button type="button" class="link-btn" id="rsvp-new" hidden>RSVP for someone else instead</button>
-    <span class="pd" role="img" aria-label="RSVP by Sat, Dec 26" style="width: 219px; height: 27px; -webkit-mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg'); mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg')"></span>
-    <form id="rsvp-form" class="row" novalidate>
-      <div class="field grow"><label class="label" for="rsvp-name">Your name</label><input id="rsvp-name" maxlength="40" autocomplete="name" required></div>
-      <div class="field" style="width: 110px"><label class="label" for="rsvp-size">Coming</label>
-        <select id="rsvp-size"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
-      <fieldset id="rsvp-guests" class="guests"><legend class="label">Who's with you (optional)</legend><div id="rsvp-guest-fields" class="guest-fields"></div></fieldset>
-      <div class="field" style="flex: 1 1 100%"><label class="label" for="rsvp-note">Note (optional)</label><input id="rsvp-note" maxlength="200"></div>
-      <div class="dialog-actions" style="flex: 1 1 100%"><button class="btn btn-quiet" type="button" id="rsvp-cancel" hidden>Can't make it</button><button class="btn btn-quiet" type="button" data-close-rsvp>Close</button><button class="btn btn-primary" type="submit" id="rsvp-submit">Send my RSVP</button></div>
+  <div id="rsvp-step-form" class="dialog-body rsvp-form-step">
+    <h2 class="rsvp-head" id="rsvp-dialog-title" role="img" aria-label="New mission">
+      <img class="art-night when-new" src="assets/img/missions/new-mission-night.png" alt=""><img class="art-day when-new" src="assets/img/missions/new-mission-day.png" alt="">
+      <img class="art-night when-edit" src="assets/img/missions/mission-accepted-night.png" alt=""><img class="art-day when-edit" src="assets/img/missions/mission-accepted-day.png" alt="">
+    </h2>
+    <p class="rsvp-brief" id="rsvp-brief"><span>Thu, Dec 31</span><span>9 PM</span><span>RSVP by Sat, Dec 26</span></p>
+    <p class="rsvp-you" id="rsvp-you" hidden></p>
+    <form id="rsvp-form" class="rsvp-grid" novalidate>
+      <div class="field rsvp-name-field"><label class="label" for="rsvp-name">Your name</label><input id="rsvp-name" maxlength="40" autocomplete="name" required placeholder="First and last"></div>
+      <div class="field rsvp-size-field"><span class="label" id="rsvp-size-label">Crew size</span>
+        <div class="stepper" role="group" aria-labelledby="rsvp-size-label">
+          <button type="button" class="step-btn" id="rsvp-minus" aria-label="One fewer">&minus;</button>
+          <output class="step-val" id="rsvp-size-out" aria-live="polite">2</output>
+          <button type="button" class="step-btn" id="rsvp-plus" aria-label="One more">+</button>
+        </div>
+        <select id="rsvp-size" hidden tabindex="-1" aria-hidden="true"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+      <fieldset id="rsvp-guests" class="guests"><legend class="label">Who's rolling with you <span class="muted">(optional)</span></legend><div id="rsvp-guest-fields" class="guest-fields"></div></fieldset>
+      <div class="field rsvp-note-field"><label class="label" for="rsvp-note">Note <span class="muted">(optional)</span></label><input id="rsvp-note" maxlength="200" placeholder="Running late, allergies, anything"></div>
+      <button class="btn btn-primary rsvp-go" type="submit" id="rsvp-submit">Accept the job</button>
     </form>
     <p class="status" id="rsvp-status" role="status"></p>
-    <button type="button" class="link-btn guests-link" data-open-guests>See who's coming</button>
+    <div class="rsvp-foot">
+      <button class="link-btn" type="button" data-close-rsvp>Close</button>
+      <button type="button" class="link-btn guests-link" data-open-guests>See who's coming</button>
+    </div>
+    <div class="rsvp-edit-foot" id="rsvp-edit-foot" hidden>
+      <button class="link-btn rsvp-bail" type="button" id="rsvp-cancel">Can't make it</button>
+      <button type="button" class="link-btn" id="rsvp-new">Add someone else</button>
+    </div>
   </div>
   <div id="rsvp-step-confirm" class="dialog-body done" hidden>
     <p class="script" style="font-size: 34px; line-height: 40px">Bail on the job?</p>
@@ -487,15 +502,15 @@
     <p class="mission-title" id="rsvp-done-title" role="img" aria-label="Mission accepted"><img class="art-night when-passed" src="assets/img/missions/mission-accepted-night.png" alt=""><img class="art-day when-passed" src="assets/img/missions/mission-accepted-day.png" alt=""><img class="art-night when-failed" src="assets/img/missions/mission-failed-night.png" alt=""><img class="art-day when-failed" src="assets/img/missions/mission-failed-day.png" alt=""></p>
     <p style="margin: 0" id="rsvp-done-text"></p>
     <div class="dialog-actions">
-      <a class="btn" href="#drinks" data-close-rsvp id="rsvp-done-drinks" style="display: inline-flex; align-items: center; text-decoration: none">Claim a drink</a>
-      <button class="btn btn-primary" type="button" data-close-rsvp>Done</button>
+      <a class="btn btn-primary" href="#drinks" data-close-rsvp id="rsvp-done-drinks" style="display: inline-flex; align-items: center; text-decoration: none">Claim a drink</a>
+      <button class="btn btn-quiet" type="button" data-close-rsvp>Done</button>
     </div>
   </div>
 </dialog>
 
 
-<script src="config.js?v=20261126f"></script>
-<script src="shared.js?v=20261126f"></script>
-<script src="app.js?v=20261126f"></script>
+<script src="config.js?v=20261126h"></script>
+<script src="shared.js?v=20261126h"></script>
+<script src="app.js?v=20261126h"></script>
 </body>
 </html>

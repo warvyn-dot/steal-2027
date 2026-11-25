@@ -822,6 +822,21 @@
     }
   }
   $("rsvp-size").addEventListener("change", () => renderGuestFields());
+  // Crew size stepper drives the (hidden) select so the rest of the form logic stays the same.
+  function syncSize() {
+    const v = Number($("rsvp-size").value);
+    $("rsvp-size-out").textContent = v;
+    $("rsvp-minus").disabled = v <= 1; $("rsvp-plus").disabled = v >= 6;
+  }
+  function stepSize(d) {
+    const v = Math.min(6, Math.max(1, Number($("rsvp-size").value) + d));
+    $("rsvp-size").value = String(v);
+    $("rsvp-size").dispatchEvent(new Event("change"));
+    syncSize();
+  }
+  $("rsvp-minus").addEventListener("click", () => stepSize(-1));
+  $("rsvp-plus").addEventListener("click", () => stepSize(1));
+  $("rsvp-size").addEventListener("change", syncSize);
   const guestValues = () => Array.from($("rsvp-guest-fields").querySelectorAll("input")).map((i) => i.value.trim()).filter(Boolean);
 
   function showRsvpState() {
@@ -839,10 +854,14 @@
     rsvpMode = mode;
     const r = store.get("steal-rsvp");
     const editing = mode === "edit";
-    $("rsvp-dialog-title").textContent = editing ? "Your RSVP" : "RSVP";
-    $("rsvp-submit").textContent = editing ? "Save changes" : "Send my RSVP";
-    $("rsvp-cancel").hidden = !editing;
-    $("rsvp-new").hidden = !editing;
+    // New: "New mission" lettering and the briefing. Already in: "Mission accepted", who they're on the list as, and the edit options.
+    $("rsvp-step-form").classList.toggle("is-edit", editing);
+    $("rsvp-dialog-title").setAttribute("aria-label", editing ? "Mission accepted" : "New mission");
+    $("rsvp-submit").textContent = editing ? "Save changes" : "Accept the job";
+    $("rsvp-edit-foot").hidden = !editing;
+    $("rsvp-brief").hidden = editing;
+    $("rsvp-you").hidden = !editing;
+    if (editing && r) $("rsvp-you").textContent = "You're on the crew, " + short(r.name) + (r.size > 1 ? ". Party of " + r.size + "." : ".") + " Change anything below.";
     if (editing) {
       $("rsvp-name").value = r.name; $("rsvp-size").value = String(r.size || 1); $("rsvp-note").value = r.note || "";
       renderGuestFields(r.guests || []);
@@ -850,6 +869,7 @@
       $("rsvp-form").reset(); $("rsvp-name").value = ""; renderGuestFields([]);
     }
     $("rsvp-form").dataset.wasEdit = editing ? "1" : "0";
+    if (typeof syncSize === "function") syncSize();
   }
 
   function openRsvp() {
@@ -916,7 +936,7 @@
           rememberName(name);
           // Keep this phone's own RSVP so it can be changed later. RSVPs for other people aren't kept.
           if (!(saved && saved.id)) store.set("steal-rsvp", { id: r.id, token: r.token, name: name, size: size, note: note, guests: guests });
-          finish("You're on the crew, " + name + (guests.length ? ", with " + guests.join(" and ") : "") + ". Doors open at 9 PM on the 31st.", "passed");
+          finish("You're on the crew, " + short(name) + (guests.length ? ", with " + guests.map(short).join(" and ") : "") + ". Doors open at 9 PM on the 31st.", "passed");
           $("rsvp-form").reset(); renderGuestFields([]);
           load();
         } else { setStatus($("rsvp-status"), "That didn't go through. Check the form and try again.", "err"); }

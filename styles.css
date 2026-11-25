@@ -958,3 +958,28 @@ html:not(.kb) .crew-name:focus-visible:not(:hover) { border-color: inherit; back
 .mission-photo .mission-art img { width: 100%; max-width: none; }
 .snack-picks-wrap { padding-bottom: 14px; }
 .snack-picks-wrap { padding-top: 14px; }
+/* RSVP pop-up: mission lettering up top, a one-line briefing, a crew-size stepper, one big action */
+.rsvp-form-step { gap: 14px; }
+.rsvp-head { margin: 0; line-height: 0; }
+.rsvp-head img { display: none; width: min(100%, 300px); height: auto; }
+[data-theme="night"] .rsvp-form-step:not(.is-edit) .rsvp-head .when-new.art-night, [data-theme="golden"] .rsvp-form-step:not(.is-edit) .rsvp-head .when-new.art-day,
+[data-theme="night"] .rsvp-form-step.is-edit .rsvp-head .when-edit.art-night, [data-theme="golden"] .rsvp-form-step.is-edit .rsvp-head .when-edit.art-day { display: block; }
+.rsvp-brief { margin: -4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.rsvp-brief span { font: 400 10px/16px Michroma, sans-serif; letter-spacing: 0.05em; text-transform: uppercase; color: var(--goal);
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--goal); background: var(--goal-soft); }
+.rsvp-you { margin: -4px 0 0; font-size: 16px; line-height: 22px; color: var(--ink); }
+.rsvp-grid { display: grid; grid-template-columns: 1fr auto; gap: 12px 12px; align-items: end; }
+.rsvp-grid .guests, .rsvp-note-field, .rsvp-go { grid-column: 1 / -1; }
+.rsvp-grid .field { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.stepper { display: inline-flex; align-items: center; height: 44px; border-radius: 12px; border: 2px solid var(--line-strong); background: var(--sunk); overflow: hidden; }
+.step-btn { width: 38px; height: 100%; border: 0; background: transparent; color: var(--art-6); font: 600 22px/1 "Tilt Neon", system-ui, sans-serif; cursor: pointer; }
+.step-btn:hover:not(:disabled) { background: var(--act-soft); }
+.step-btn:disabled { opacity: 0.3; cursor: default; }
+.step-val { min-width: 26px; text-align: center; font: 400 18px/1 Michroma, sans-serif; color: var(--ink); }
+.rsvp-go { width: 100%; min-height: 44px; font-size: 17px; margin-top: 2px; }
+.rsvp-foot, .rsvp-edit-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.rsvp-edit-foot { padding-top: 10px; border-top: 1px solid var(--line); }
+.rsvp-bail { color: var(--owe) !important; }
+.label .muted { text-transform: none; letter-spacing: 0; }
+#rsvp-size[hidden] { display: none !important; }
+dialog { overflow-x: hidden; }
