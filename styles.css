@@ -983,3 +983,23 @@ html:not(.kb) .crew-name:focus-visible:not(:hover) { border-color: inherit; back
 .label .muted { text-transform: none; letter-spacing: 0; }
 #rsvp-size[hidden] { display: none !important; }
 dialog { overflow-x: hidden; }
+/* Production credit under the footer links */
+.credit { margin: 4px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+  font: 400 10px/16px Michroma, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+.credit-name { color: var(--ink); }
+.fine-print a { color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
+/* Names a button in instruction text: glows like neon so people know what to look for */
+.neon-word { font-weight: 700; color: #ff59c4; white-space: nowrap;
+  text-shadow: 0 0 4px rgba(255, 89, 196, 0.9), 0 0 10px rgba(255, 89, 196, 0.7), 0 0 20px rgba(255, 89, 196, 0.45); }
+[data-theme="golden"] .neon-word { color: #c2187f; text-shadow: 0 0 6px rgba(255, 89, 196, 0.55), 0 0 14px rgba(255, 89, 196, 0.35); }
+@media (prefers-reduced-motion: no-preference) { .neon-word { animation: neon-flicker 4s ease-in-out infinite; } }
+@keyframes neon-flicker { 0%, 100% { opacity: 1; } 47% { opacity: 1; } 48% { opacity: 0.55; } 49% { opacity: 1; } 51% { opacity: 0.7; } 52% { opacity: 1; } }
+.credit-logo { display: inline-flex; border-radius: 8px; transition: transform .15s ease; }
+.credit-logo:hover { transform: scale(1.04); }
+.credit-logo:active { transform: scale(.97); }
+.credit-logo img { display: none; height: 48px; width: auto; }
+html[data-theme="night"] .credit-logo img.art-night,
+html[data-theme="golden"] .credit-logo img.art-day { display: block; }
+/* Tighter footer: links closer to the RSVP card, logo closer to the links */
+.site-foot { padding-top: 0; margin-top: -4px; }
+.credit { margin-top: -10px; }
