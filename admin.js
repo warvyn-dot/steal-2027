@@ -107,7 +107,7 @@
       if (f.type) { inp.type = f.type; inp.min = "1"; inp.max = "10"; inp.inputMode = "numeric"; }
       inp.value = f.value == null ? "" : String(f.value);
       wrap.appendChild(inp);
-      if (f.hint) wrap.appendChild(S.el("span", { class: "small muted" }, f.hint));
+      if (f.hint) wrap.appendChild(S.el("span", { class: "small muted instruct" }, f.hint));
       box.appendChild(wrap);
     });
     editSave = save; editRemove = remove || null;

@@ -1,3 +1,16 @@
+// Names on the guest-facing site are always "First L": "Michael Weaver" shows as "Michael W", never the last name.
+function stealShortName(n) {
+  const parts = String(n || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "";
+  if (parts.length === 1) return parts[0];
+  return parts[0] + " " + parts[parts.length - 1].charAt(0).toUpperCase();
+}
+// Focus rings only for keyboard users: Tab turns them on, any tap or click turns them off.
+(function () {
+  const root = document.documentElement;
+  window.addEventListener("keydown", (e) => { if (e.key === "Tab") root.classList.add("kb"); }, true);
+  window.addEventListener("pointerdown", () => root.classList.remove("kb"), true);
+})();
 // Shared helpers for the guest and admin pages.
 (function () {
   const cfg = window.STEAL_CONFIG || {};
@@ -30,7 +43,18 @@
       .map(([supply_id, guest_name], i) => ({ id: i + 1, supply_id, guest_name, created_at: now() }));
     const beer = [{ id: 8, guest_name: "Chris", note: "A 12-pack of Modelo", created_at: now() }, { id: 9, guest_name: "Taylor", note: "A few local IPAs", created_at: now() }];
     const write_ins = [{ id: 10, guest_name: "Jen", item: "Mezcal", created_at: now() }];
-    const rsvps = [{ id: 11, guest_name: "Mike", party_size: 2, note: "Bringing the speaker", guests: ["Ana"], created_at: now() }];
+    // Sample RSVPs (preview only): everyone on the sample crew, plus Mike, with a mix of plus-ones.
+    const rsvps = [
+      { id: 11, guest_name: "Mike Weaver", party_size: 2, note: "Bringing the speaker", guests: ["Ana Lopez"], created_at: now() },
+      { id: 12, guest_name: "Dani Ruiz", party_size: 2, note: null, guests: ["Leo Ruiz"], created_at: now() },
+      { id: 13, guest_name: "Marcus Bell", party_size: 1, note: null, guests: [], created_at: now() },
+      { id: 14, guest_name: "Sam Okafor", party_size: 2, note: "Might be a little late", guests: [], created_at: now() },
+      { id: 15, guest_name: "Priya Shah", party_size: 2, note: null, guests: ["Dev Patel"], created_at: now() },
+      { id: 16, guest_name: "Jo Nguyen", party_size: 1, note: null, guests: [], created_at: now() },
+      { id: 17, guest_name: "Chris Hall", party_size: 3, note: null, guests: ["Kayla Hall", "Ben Ortiz"], created_at: now() },
+      { id: 18, guest_name: "Taylor Reed", party_size: 2, note: null, guests: ["Morgan Lee"], created_at: now() },
+      { id: 19, guest_name: "Jen Park", party_size: 1, note: "Bringing mezcal", guests: [], created_at: now() }
+    ];
     const PIN = "2237";
     // Same starter list as supabase/migrations/004_host_checklist.sql
     let hid = 100;
@@ -48,6 +72,8 @@
     const who = (id) => claims.filter((x) => x.supply_id === id).map((x) => x.guest_name);
     const pull = (list, id) => { const i = list.findIndex((c) => c.id === id); if (i >= 0) list.splice(i, 1); };
     return {
+      get_guest_list: () => rsvps.map((r) => ({ name: stealShortName(r.guest_name), party: r.party_size,
+        guests: (r.guests || []).map(stealShortName).filter(Boolean) })),
       get_board: () => ({
         supplies: supplies.map((s) => Object.assign({}, s, { claimers: who(s.id) })),
         beer: beer.map((b) => ({ guest_name: b.guest_name, note: b.note })),

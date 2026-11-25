@@ -7,7 +7,7 @@
 <title>Steal 2027: crew dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261125f">
+<link rel="stylesheet" href="styles.css?v=20261126f">
 </head>
 <body>
 <main class="page" style="max-width: 900px">
@@ -54,14 +54,14 @@
         <button type="button" role="tab" class="seg-btn" id="seg-todo" aria-selected="true">Still needed</button>
         <button type="button" role="tab" class="seg-btn" id="seg-all" aria-selected="false">Everything</button>
       </div>
-      <h3 class="adm-sub">Your run <span class="muted small">Tap to check off</span></h3>
+      <h3 class="adm-sub">Your run <span class="muted small instruct">Tap to check off</span></h3>
       <div id="host-list" class="check-groups"></div>
       <form id="host-add" class="host-add" novalidate>
         <label class="sr-only" for="host-new">Add something to your run</label>
         <input id="host-new" maxlength="80" placeholder="Add something to your run" autocomplete="off">
         <button class="btn btn-primary" type="submit">Add</button>
       </form>
-      <h3 class="adm-sub">From the crew <span class="muted small">Checks itself as guests claim. Tap a name to edit it.</span></h3>
+      <h3 class="adm-sub">From the crew <span class="muted small instruct">Checks itself as guests claim. Tap a name to edit it.</span></h3>
       <ul id="crew-checks" class="check-list"></ul>
     </section>
 
@@ -74,7 +74,7 @@
       <div class="adm-card-head"><h2 id="also-h2" class="adm-h">Also bringing</h2></div>
       <h3 class="adm-sub">Beer</h3>
       <ul class="adm-rows" id="t-beer"></ul>
-      <h3 class="adm-sub">Something else</h3>
+      <h3 class="adm-sub">Snacks</h3>
       <ul class="adm-rows" id="t-writeins"></ul>
     </section>
 
@@ -96,8 +96,8 @@
     </div>
   </form>
 </dialog>
-<script src="config.js?v=20261125f"></script>
-<script src="shared.js?v=20261125f"></script>
-<script src="admin.js?v=20261125f"></script>
+<script src="config.js?v=20261126f"></script>
+<script src="shared.js?v=20261126f"></script>
+<script src="admin.js?v=20261126f"></script>
 </body>
 </html>

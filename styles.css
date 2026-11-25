@@ -402,9 +402,27 @@ td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; }
   align-self: flex-start; max-width: 86%; padding: 10px 14px; border-radius: 18px 18px 18px 6px;
   background: rgba(59, 20, 107, 0.92); border: 1.5px solid #ff59c4; font-size: 17px; line-height: 24px;
 }
-.bubbles li.typing { color: #c4b2e2; letter-spacing: 0.2em; }
+/* iMessage-style typing bubble: three dots hop one after another */
+.bubbles li.typing { display: inline-flex; align-items: center; gap: 5px; padding: 12px 14px; min-height: 0; }
+.bubbles li.typing .dot { width: 8px; height: 8px; border-radius: 50%; background: #c4b2e2; opacity: 0.55; }
+@media (prefers-reduced-motion: no-preference) {
+  .bubbles li.typing .dot { animation: dot-hop 1.1s ease-in-out infinite; }
+  .bubbles li.typing .dot:nth-child(2) { animation-delay: 0.15s; }
+  .bubbles li.typing .dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dot-hop { 0%, 60%, 100% { transform: translateY(0); opacity: 0.55; } 30% { transform: translateY(-5px); opacity: 1; } }
+}
 @media (prefers-reduced-motion: no-preference) { .bubbles li { animation: bubble-in 220ms ease-out both; } @keyframes bubble-in { from { opacity: 0; transform: translateY(8px); } } }
 .call-go { margin-top: 14px; }
+.type-caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -0.15em; background: currentColor; animation: caret-blink 0.8s steps(1) infinite; }
+@keyframes caret-blink { 50% { opacity: 0; } }
+/* "I'm in" pulses a neon glow so it reads as the thing to tap */
+@media (prefers-reduced-motion: no-preference) {
+  .call-go.typed { animation: go-pulse 1.8s ease-in-out infinite; }
+  @keyframes go-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 89, 196, 0.55), 0 0 12px rgba(255, 89, 196, 0.35); }
+    50% { box-shadow: 0 0 0 8px rgba(255, 89, 196, 0), 0 0 28px rgba(255, 89, 196, 0.85); }
+  }
+}
 
 /* Crew counter, footer links */
 .link-btn { border: 0; background: none; padding: 0; font: 600 15px/20px "Tilt Neon", system-ui, sans-serif; color: var(--ink-muted); text-decoration: underline; cursor: pointer; }
@@ -549,13 +567,20 @@ td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; }
 [data-theme="night"] .art-day, [data-theme="golden"] .art-night { display: none; }
 .mission-tag { display: inline-flex; align-items: center; min-width: 0; }
 /* "Side mission" replaces "New mission" on the Drinks tab */
-.mission-tag .when-side, html.on-side-mission .mission-tag .when-main { display: none; }
-html.on-side-mission[data-theme="night"] .mission-tag .when-side.art-night, html.on-side-mission[data-theme="golden"] .mission-tag .when-side.art-day { display: block; }
+/* Only the lettering for the current tab shows (html[data-mission] is set by app.js) */
+.mission-tag img { display: none !important; }
+html[data-mission="main"][data-theme="night"] .mission-tag .mt-main.art-night, html[data-mission="main"][data-theme="golden"] .mission-tag .mt-main.art-day,
+html[data-mission="side"][data-theme="night"] .mission-tag .mt-side.art-night, html[data-mission="side"][data-theme="golden"] .mission-tag .mt-side.art-day,
+html[data-mission="suit"][data-theme="night"] .mission-tag .mt-suit.art-night, html[data-mission="suit"][data-theme="golden"] .mission-tag .mt-suit.art-day,
+html[data-mission="rv"][data-theme="night"] .mission-tag .mt-rv.art-night, html[data-mission="rv"][data-theme="golden"] .mission-tag .mt-rv.art-day,
+html:not([data-mission])[data-theme="night"] .mission-tag .mt-main.art-night, html:not([data-mission])[data-theme="golden"] .mission-tag .mt-main.art-day { display: block !important; }
 /* Fills the topbar up to the sun/moon. Its height matches the 52px badge wherever the screen is wide enough;
    on phones the full width only allows about 28px of height. */
 .topbar:has(.mission-tag) { flex-wrap: nowrap; }
 .topbar .mission-tag { flex: 1 1 auto; min-width: 0; margin-right: 14px; }
-.mission-tag img { display: block; width: 100%; max-width: 532px; height: auto; }
+/* Every tag is set to the same letter height (what "New mission" gets when it fills the bar), so short words like
+   "Suit up" don't blow up bigger; they just take less width. */
+.mission-tag img { width: auto; max-width: 100%; height: min(52px, calc((100vw - 110px) / 9.8)); }
 .mission-title { margin: 6px auto 4px; display: flex; justify-content: center; }
 .mission-title img { display: block; width: min(100%, 320px); height: auto; }
 .mission-title .when-failed, #rsvp-step-done.is-failed .mission-title .when-passed { display: none; }
@@ -829,3 +854,107 @@ button.chip-also { min-height: 40px; }
 .edit-fields .field { display: flex; flex-direction: column; gap: 4px; }
 .edit-actions .edit-remove { margin-right: auto; color: var(--owe); }
 .who-pill { padding: 2px 10px; }
+/* No focus box or tap flash for touch and mouse. The ring only comes back after someone presses Tab,
+   so keyboard users can still see where they are. html.kb is set by shared.js. */
+html { -webkit-tap-highlight-color: transparent; }
+html:not(.kb) :focus, html:not(.kb) :focus-visible { outline: none !important; }
+html:not(.kb) .check-input:focus-visible + .check-box { outline: none; }
+html:not(.kb) .crew-name:focus-visible:not(:hover) { border-color: inherit; background: inherit; }
+/* Beer run and Snack run: side by side on wide screens, stacked on phones */
+.bring-grid { align-items: start; }
+.snack-picks-wrap { padding: 14px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+.snack-picks .chip-add { min-height: 38px; }
+.snack-picks .chip-add:active { transform: scale(0.96); }
+/* Crew card as a heist meter: the score, one slot per drink, a nudge toward the closest drink, then the crew */
+.heist-meter { display: flex; flex-direction: column; gap: 10px; }
+.heist-score { display: flex; align-items: baseline; gap: 10px; }
+.heist-num { font: 400 40px/1 Michroma, sans-serif; color: var(--ink); letter-spacing: -0.02em; }
+.heist-of { font-size: 0.5em; color: var(--ink-muted); margin-left: 2px; }
+.heist-label { font-size: 15px; line-height: 20px; color: var(--ink-muted); }
+.heist-slots { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.heist-cell { display: block; }
+.heist-slot { position: relative; display: block; width: 100%; height: 30px; padding: 0; border-radius: 8px; border: 2px solid var(--art-6); background: var(--sunk); overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.heist-slot:hover, .heist-cell.is-open .heist-slot { border-color: var(--goal); }
+.heist-fill { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(0deg, var(--art-3), var(--art-4)); opacity: 0.75; transition: height 500ms ease; }
+.heist-slot.is-ready { border-color: var(--grow); }
+.heist-slot.is-ready .heist-fill { background: var(--grow); opacity: 1; }
+[data-theme="night"] .heist-slot.is-ready { box-shadow: 0 0 10px var(--grow); }
+.heist-next { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; padding: 10px 14px; border-radius: 12px;
+  border: 1.5px dashed var(--art-6); background: var(--act-soft); color: var(--ink); font: 500 15px/20px "Tilt Neon", system-ui, sans-serif; cursor: pointer; }
+.heist-next:hover { border-style: solid; }
+.heist-next:disabled { cursor: default; border-style: solid; border-color: var(--grow); background: var(--grow-soft); }
+.heist-next-k { font: 400 11px/16px Michroma, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; color: var(--goal); }
+.heist-next { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; align-items: center; }
+.heist-next-k { grid-column: 1; }
+.heist-next-t { grid-column: 1; }
+.heist-next::after { content: "\2192"; grid-column: 2; grid-row: 1 / span 2; font-size: 20px; color: var(--art-6); }
+.heist-next:disabled::after { content: none; }
+.crew-roll { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.crew-count { margin: 0; font: 400 12px/18px Michroma, sans-serif; letter-spacing: 0.03em; color: var(--ink-muted); }
+.crew-name { display: inline-flex; align-items: center; gap: 8px; padding: 0 12px 0 3px; min-height: 34px; }
+.crew-badge { width: 26px; height: 26px; font-size: 12px; }
+.crew-name.is-me .crew-badge { box-shadow: 0 0 0 2px var(--sunk), 0 0 0 3.5px var(--grow); }
+@media (prefers-reduced-motion: no-preference) {
+  /* Blooms out from the card's normal look, then eases back to it (no from/to keyframes, so it starts and ends on the card's own shadow) */
+  .drink-card.flash { animation: card-bloom 1.8s ease-in-out; }
+  @keyframes card-bloom { 35% { box-shadow: 0 0 0 3px #ff59c4, 0 0 32px 10px rgba(255, 89, 196, 0.85), 0 0 80px 24px rgba(255, 89, 196, 0.45); } }
+}
+/* Bigger crew title, tighter space around it */
+.crew-card { padding-top: 14px; }
+.crew-card .crew-head { margin-bottom: -4px; }
+.pop-status { margin: 0 0 6px; font: 500 13px/18px "Tilt Neon", system-ui, sans-serif; color: var(--ink-muted); }
+.pop-status.is-ready { margin: 0; color: var(--grow); font-weight: 600; }
+/* Drink slot pop-up: still needed vs covered */
+.pop-group { margin: 8px 0 4px; font: 400 10px/14px Michroma, sans-serif; letter-spacing: 0.05em; text-transform: uppercase; }
+.pop-group.is-need { color: var(--owe); }
+.pop-group.is-got { color: var(--grow); }
+.person-pop .pop-list li { display: flex; align-items: baseline; gap: 8px; padding-left: 0; border-left: 0; }
+.pop-mark { flex-shrink: 0; width: 12px; height: 12px; border-radius: 50%; align-self: center; }
+.pop-need .pop-mark { border: 2px dashed var(--owe); }
+.pop-need.is-liquor .pop-mark { border-color: var(--goal); }
+.pop-got .pop-mark { background: var(--grow); }
+.pop-got { color: var(--ink-muted) !important; }
+.pop-who { margin-left: auto; padding-left: 8px; font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
+.heist-cell .person-pop { min-width: 220px; max-width: min(280px, calc(100vw - 32px)); }
+/* Lines that tell guests what to do read as instructions */
+.instruct { font-style: italic; }
+/* Public guest list pop-up */
+.guest-list { min-height: calc(5 * 44px + 4 * 8px); }
+.guest-brings { color: var(--ink); opacity: 0.85; }
+.guests-link { align-self: flex-start; }
+/* Slot cards: the drink name at the top is a button that jumps to that drink */
+.heist-cell .person-pop { pointer-events: auto; }
+.heist-cell .person-pop::before { content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 10px; } /* keeps hover alive across the gap */
+.pop-name { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin: 0 0 6px; padding: 8px 10px; border-radius: 10px;
+  border: 1.5px solid var(--art-6); background: var(--act-soft); color: var(--ink); cursor: pointer; text-align: left;
+  font: 400 12px/16px Michroma, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
+.pop-name-t { text-decoration: underline; text-decoration-color: var(--art-6); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.pop-name-arrow { font: 600 18px/1 "Tilt Neon", system-ui, sans-serif; color: var(--art-6); transition: transform 150ms ease; }
+.pop-name:hover { background: var(--art-6); color: #1c0a38; }
+.pop-name:hover .pop-name-t { text-decoration-color: currentColor; }
+.pop-name:hover .pop-name-arrow { color: #1c0a38; transform: translateX(3px); }
+#scroll-room { margin-top: -14px; }
+/* Shorter buttons everywhere: chips match the selected-liquor chips (36px), main buttons sit just above */
+.btn { min-height: 38px; padding: 0 18px; }
+.chip-add, .snack-picks .chip-add, button.chip-also, .chip-done, .chip-house { min-height: 36px; }
+.mylist-btn { height: 36px; min-height: 36px; }
+.crew-head { min-height: 36px; }
+.guest-pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pager-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--art-6); background: var(--act-soft); color: var(--ink); cursor: pointer; }
+.pager-btn svg { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.pager-btn:hover:not(:disabled) { background: var(--art-6); color: #1c0a38; }
+.pager-btn:disabled { opacity: 0.35; cursor: default; }
+.pager-text { font: 400 11px/16px Michroma, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); }
+/* At midnight: label above, bigger Mission Passed lettering on the photo */
+#mission-slot { display: flex; flex-direction: column; gap: 14px; }
+.mission-photo .mission-words > * { max-width: 92%; }
+.mission-photo .mission-art { width: 88%; }
+.mission-art img { max-width: 560px; }
+.mission-photo .mission-art { margin-top: 6px; }
+.ready-above { display: flex; margin-bottom: 2px; }
+/* Mission Passed lettering spans the full width of the card */
+.mission-photo .mission-words { align-self: stretch; width: 100%; }
+.mission-photo .mission-words > .mission-art { max-width: none; width: 100%; }
+.mission-photo .mission-art img { width: 100%; max-width: none; }
+.snack-picks-wrap { padding-bottom: 14px; }
+.snack-picks-wrap { padding-top: 14px; }

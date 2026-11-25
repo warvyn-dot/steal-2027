@@ -27,7 +27,7 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Tilt+Neon&family=Yellowtail&display=swap">
-<link rel="stylesheet" href="styles.css?v=20261125f">
+<link rel="stylesheet" href="styles.css?v=20261126f">
 </head>
 <body>
 <div class="call" id="call" hidden aria-live="polite">
@@ -50,7 +50,7 @@
 <div class="app">
 <header class="page topbar-wrap">
   <div class="topbar">
-    <span class="mission-tag" id="mission-tag" role="img" aria-label="New mission"><img class="art-night when-main" src="assets/img/missions/new-mission-night.png" alt=""><img class="art-day when-main" src="assets/img/missions/new-mission-day.png" alt=""><img class="art-night when-side" src="assets/img/missions/side-mission-night.png" alt=""><img class="art-day when-side" src="assets/img/missions/side-mission-day.png" alt=""></span>
+    <span class="mission-tag" id="mission-tag" role="img" aria-label="New mission"><img class="art-night mt-main" src="assets/img/missions/new-mission-night.png" alt=""><img class="art-day mt-main" src="assets/img/missions/new-mission-day.png" alt=""><img class="art-night mt-side" src="assets/img/missions/side-mission-night.png" alt=""><img class="art-day mt-side" src="assets/img/missions/side-mission-day.png" alt=""><img class="art-night mt-suit" src="assets/img/missions/suit-up-night.png" alt=""><img class="art-day mt-suit" src="assets/img/missions/suit-up-day.png" alt=""><img class="art-night mt-rv" src="assets/img/missions/rendezvous-night.png" alt=""><img class="art-day mt-rv" src="assets/img/missions/rendezvous-day.png" alt=""></span>
     <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch to day"><img class="theme-icon theme-sun" src="assets/img/theme-sun.png" alt="" width="52" height="52"><img class="theme-icon theme-moon" src="assets/img/theme-moon.png" alt="" width="52" height="52" onerror="this.closest('button').classList.add('no-moon')"><span class="theme-fallback" aria-hidden="true">Night</span></button>
   </div>
 </header>
@@ -118,14 +118,14 @@
       <div class="look-body art-body">
         <div class="card-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"></path><path d="M12 13v7"></path><path d="M8.5 21h7"></path></svg><span class="label">Bring</span></div>
         <h2><span class="pd" role="img" aria-label="Drinks" style="width: 92px; height: 29px; -webkit-mask-image: url('assets/headers/25-drinks.svg'); mask-image: url('assets/headers/25-drinks.svg')"></span></h2>
-        <p class="muted" style="margin: 0">Grab one ingredient so nobody doubles up.</p>
+        <p class="muted instruct" style="margin: 0">Grab one ingredient so nobody doubles up.</p>
         <span class="go">Open the drink list</span>
       </div>
     </a>
     <section class="card rsvp-card" aria-labelledby="rsvp-h">
       <h2 id="rsvp-h"><span class="pd" role="img" aria-label="RSVP by Sat, Dec 26" style="width: 219px; height: 27px; -webkit-mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg'); mask-image: url('assets/headers/06-rsvp-by-sat-dec-26.svg')"></span></h2>
-      <p class="muted" style="margin: 0" id="rsvp-card-text">Plus-ones welcome. Tell us who's rolling with you.</p>
-      <div class="row"><button class="btn btn-primary" type="button" data-open-rsvp>Accept the job</button></div>
+      <p class="muted instruct" style="margin: 0" id="rsvp-card-text">Plus-ones welcome. Tell us who's rolling with you.</p>
+      <div class="row"><button class="btn btn-primary" type="button" data-open-rsvp>Accept the job</button><button class="btn btn-quiet" type="button" data-open-guests>See who's coming</button></div>
     </section>
   </div>
 
@@ -227,26 +227,34 @@
 
   <section class="card crew-card" aria-labelledby="crew-h">
     <div class="crew-head">
-      <h2 id="crew-h" class="label" style="margin: 0">The crew</h2>
+      <h2 id="crew-h" style="margin: 0; line-height: 0"><span class="pd" role="img" aria-label="The crew" style="width: 160px; height: 40px; -webkit-mask-image: url('assets/headers/28-the-crew.svg'); mask-image: url('assets/headers/28-the-crew.svg')"></span></h2>
       <button class="btn mylist-btn" type="button" id="mylist-open" aria-haspopup="dialog" hidden><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"></path></svg>My list <span class="mylist-count" id="mylist-count">0</span></button>
     </div>
-    <p class="heading" id="crew-line" style="margin: 0">Nobody's claimed anything yet</p>
-    <ul class="crew-people" id="crew-names" aria-label="Who is bringing what"></ul>
-    <div class="ready-bar" id="ready-bar" role="img" aria-label="0 of 8 drinks ready to pour"><div class="ready-fill" id="ready-fill"></div><div class="ready-knob" id="ready-knob"></div></div>
-    <p class="small muted" id="ready-text" style="margin: 0">0 of 8 drinks ready to pour</p>
+    <div class="heist-meter">
+      <div class="heist-score">
+        <span class="heist-num"><span id="ready-num">0</span><span class="heist-of">/<span id="ready-total">8</span></span></span>
+        <span class="heist-label">drinks ready to pour</span>
+      </div>
+      <ol class="heist-slots" id="ready-slots" aria-label="0 of 8 drinks ready to pour"></ol>
+      <button type="button" class="heist-next" id="ready-next" hidden></button>
+    </div>
+    <div class="crew-roll">
+      <p class="crew-count" id="crew-line">Nobody's on the crew yet</p>
+      <ul class="crew-people" id="crew-names" aria-label="Who is bringing what"></ul>
+    </div>
   </section>
 
   <section class="jobs" aria-labelledby="jobs-h">
     <div class="jobs-head">
       <h2 id="jobs-h" class="label" style="margin: 0">Tonight's jobs</h2>
-      <p class="small muted" style="margin: 0">Tap everything you'll bring, then hit Bring these at the bottom. Already claimed? You can still bring some too. We've got the ice.</p>
+      <p class="small muted instruct" style="margin: 0">Tap everything you'll bring, then hit Bring these at the bottom. Already claimed? You can still bring some too. We've got the ice.</p>
     </div>
     <div class="jobs-list grid2" id="jobs"></div>
   </section>
 
+  <div class="bring-grid grid2">
   <section class="also" aria-labelledby="also-h">
-    <h2 id="also-h" class="label" style="margin: 0">Also on the list</h2>
-    <div class="grid2 also-grid">
+    <h2 id="also-h" class="label" style="margin: 0">Beer run</h2>
     <article class="card also-card" aria-labelledby="beer-h">
       <h3 id="beer-h" class="sr-only">Beer</h3>
       <button type="button" class="big-btn beer-art" id="beer-open" aria-label="Bring beer">
@@ -254,7 +262,7 @@
         <span class="beer-over">
           <span class="big-btn-text">
             <span class="pd" aria-hidden="true" style="width: 123px; height: 41px; -webkit-mask-image: url('assets/headers/08-beer.svg'); mask-image: url('assets/headers/08-beer.svg')"></span>
-            <span class="small">Tap to add your name.</span>
+            <span class="small instruct">Tap to add your name.</span>
           </span>
           <span class="big-btn-plus" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span>
         </span>
@@ -264,26 +272,40 @@
         <ul class="roster-list" id="beer-list"></ul>
       </div>
     </article>
+  </section>
 
+  <section class="also snacks" aria-labelledby="snacks-h">
+    <h2 id="snacks-h" class="label" style="margin: 0">Snack run</h2>
     <article class="card also-card" aria-labelledby="wi-h">
-      <button type="button" class="big-btn beer-art" id="wi-open" aria-haspopup="dialog" aria-labelledby="wi-h">
+      <h3 id="wi-h" class="sr-only">Snacks</h3>
+      <button type="button" class="big-btn beer-art" id="wi-open" aria-haspopup="dialog" aria-label="Bring a snack">
         <img class="beer-photo art-day" src="assets/img/drinks/something-else-day.jpg" alt="" loading="lazy" decoding="async">
         <img class="beer-photo art-night" src="assets/img/drinks/something-else-night.jpg" alt="" loading="lazy" decoding="async">
         <span class="beer-over">
           <span class="big-btn-text">
-            <span class="drink-name also-title" id="wi-h">Something else?</span>
-            <span class="small">Snacks, wine, dessert. Add it so nobody doubles up.</span>
+            <span class="pd" aria-hidden="true" style="width: 195px; height: 41px; -webkit-mask-image: url('assets/headers/26-snacks.svg'); mask-image: url('assets/headers/26-snacks.svg')"></span>
+            <span class="small">Food, dessert, wine, anything.</span>
           </span>
           <span class="big-btn-plus" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span>
         </span>
       </button>
+      <div class="snack-picks-wrap">
+        <ul class="supply-chips snack-picks" aria-label="Quick picks">
+          <li><button type="button" class="chip chip-add snack-pick" data-item="Chips and dip"><svg class="chip-plus" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Chips and dip</button></li>
+          <li><button type="button" class="chip chip-add snack-pick" data-item="Dessert"><svg class="chip-plus" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Dessert</button></li>
+          <li><button type="button" class="chip chip-add snack-pick" data-item="Veggie tray"><svg class="chip-plus" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Veggie tray</button></li>
+          <li><button type="button" class="chip chip-add snack-pick" data-item="Cookies"><svg class="chip-plus" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Cookies</button></li>
+          <li><button type="button" class="chip chip-add snack-pick" data-item="Pizza rolls"><svg class="chip-plus" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Pizza rolls</button></li>
+          <li><button type="button" class="chip chip-add snack-pick" data-item="Fruit"><svg class="chip-plus" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Fruit</button></li>
+        </ul>
+      </div>
       <div class="roster">
-        <p class="roster-count" id="wi-count">Nothing extra yet.</p>
+        <p class="roster-count" id="wi-count">No snacks yet. Be the hero.</p>
         <ul class="roster-list" id="writein-list"></ul>
       </div>
     </article>
-    </div>
   </section>
+  </div>
 
   <div id="mission-slot"></div>
 </section>
@@ -363,7 +385,7 @@
     <p class="drink-name" id="mylist-title" style="font-size: 32px; line-height: 38px">My list</p>
     <p class="muted" id="mylist-who" style="margin: 0"></p>
     <ul class="run-list" id="mylist-items"></ul>
-    <p class="small muted" id="mylist-swap" style="margin: 0">Need to swap something? Text Sean at (214) 585-3256.</p>
+    <p class="small muted instruct" id="mylist-swap" style="margin: 0">Need to swap something? Text Sean at (214) 585-3256.</p>
     <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Got it</button></div>
   </div>
 </dialog>
@@ -400,17 +422,32 @@
 
 <dialog id="wi-dialog" class="bring-dialog" aria-labelledby="wi-title">
   <form id="writein-form" class="dialog-body" novalidate>
-    <p class="drink-name" id="wi-title" style="font-size: 32px; line-height: 38px">Bringing something else?</p>
-    <p class="muted" style="margin: 0">Add it so nobody doubles up.</p>
-    <div class="field"><label class="label" for="wi-item">What you're bringing</label><input id="wi-item" maxlength="60" placeholder="Snacks, wine, dessert, anything"></div>
+    <h2 id="wi-title" style="margin: 0; line-height: 0"><span class="pd" role="img" aria-label="Snacks" style="width: 138px; height: 29px; -webkit-mask-image: url('assets/headers/26-snacks.svg'); mask-image: url('assets/headers/26-snacks.svg')"></span></h2>
+    <p class="muted instruct" style="margin: 0">Food, dessert, wine, anything. Add it so nobody doubles up.</p>
+    <div class="field"><label class="label" for="wi-item">What you're bringing</label><input id="wi-item" maxlength="60" placeholder="Buffalo dip, cookies, a bottle of wine"></div>
     <div class="field"><label class="label" for="wi-name">Your name</label><input id="wi-name" maxlength="40" autocomplete="given-name"></div>
     <p class="status" id="writein-status" role="status"></p>
-    <div class="dialog-actions"><button class="btn btn-quiet" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit" id="wi-submit">Add it</button></div>
+    <div class="dialog-actions"><button class="btn btn-quiet" type="button" data-close>Cancel</button><button class="btn btn-primary" type="submit" id="wi-submit">I'll bring it</button></div>
   </form>
   <div id="wi-done" class="dialog-body done" hidden>
     <p class="drink-name" style="font-size: 32px; line-height: 38px">Added</p>
     <p id="wi-done-text" style="margin: 0"></p>
     <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="guests-dialog" class="bring-dialog" aria-labelledby="guests-title">
+  <div class="dialog-body">
+    <p class="drink-name" id="guests-title" style="font-size: 32px; line-height: 38px">Who's coming</p>
+    <p class="muted" id="guests-count" style="margin: 0"></p>
+    <ul class="roster-list guest-list" id="guest-list"></ul>
+    <div class="guest-pager" id="guest-pager" hidden>
+      <button type="button" class="pager-btn" id="guest-prev" aria-label="Previous page"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      <span class="pager-text" id="guest-page" aria-live="polite"></span>
+      <button type="button" class="pager-btn" id="guest-next" aria-label="Next page"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>
+    </div>
+    <p class="small muted instruct" style="margin: 0">First names and last initials only. Bringing something? Claim it on the Drinks tab.</p>
+    <div class="dialog-actions"><button class="btn btn-primary" type="button" data-close>Close</button></div>
   </div>
 </dialog>
 
@@ -428,6 +465,7 @@
       <div class="dialog-actions" style="flex: 1 1 100%"><button class="btn btn-quiet" type="button" id="rsvp-cancel" hidden>Can't make it</button><button class="btn btn-quiet" type="button" data-close-rsvp>Close</button><button class="btn btn-primary" type="submit" id="rsvp-submit">Send my RSVP</button></div>
     </form>
     <p class="status" id="rsvp-status" role="status"></p>
+    <button type="button" class="link-btn guests-link" data-open-guests>See who's coming</button>
   </div>
   <div id="rsvp-step-confirm" class="dialog-body done" hidden>
     <p class="script" style="font-size: 34px; line-height: 40px">Bail on the job?</p>
@@ -456,8 +494,8 @@
 </dialog>
 
 
-<script src="config.js?v=20261125f"></script>
-<script src="shared.js?v=20261125f"></script>
-<script src="app.js?v=20261125f"></script>
+<script src="config.js?v=20261126f"></script>
+<script src="shared.js?v=20261126f"></script>
+<script src="app.js?v=20261126f"></script>
 </body>
 </html>

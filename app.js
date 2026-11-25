@@ -23,11 +23,12 @@
     document.querySelectorAll(".tabbar a").forEach((a) => {
       if (a.dataset.tab === view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    // The Drinks tab is a side mission: swap the top-left lettering.
-    const side = view === "drinks";
-    document.documentElement.classList.toggle("on-side-mission", side);
+    // Each tab has its own top-left lettering: New mission, Side mission (Drinks), Suit up (Dress), Rendezvous (Location).
+    const MT = { home: ["main", "New mission"], drinks: ["side", "Side mission"], "dress-code": ["suit", "Suit up"], location: ["rv", "Rendezvous"] };
+    const mt = MT[view] || MT.home;
+    document.documentElement.dataset.mission = mt[0];
     const tag = $("mission-tag");
-    if (tag) tag.setAttribute("aria-label", side ? "Side mission" : "New mission");
+    if (tag) tag.setAttribute("aria-label", mt[1]);
     window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);
@@ -47,7 +48,7 @@
     $("call").hidden = false; $("call").classList.remove("leaving");
     $("call-ring").hidden = false; $("call-chat").hidden = true;
     $("call-status").textContent = "Incoming call"; $("call-sub").textContent = "mobile";
-    $("bubbles").textContent = ""; $("call-go").hidden = true;
+    $("bubbles").textContent = ""; $("call-go").hidden = true; $("call-go").classList.remove("typed");
     $("call-accept").focus();
   }
   async function acceptCall() {
@@ -55,7 +56,8 @@
     const list = $("bubbles");
     for (const line of LINES) {
       if (!calm) {
-        const typing = S.el("li", { class: "typing", "aria-hidden": "true" }, "...");
+        const typing = S.el("li", { class: "typing", "aria-hidden": "true" });
+        for (let i = 0; i < 3; i++) typing.appendChild(S.el("span", { class: "dot" }));
         list.appendChild(typing);
         // How long he "types" before each text lands: quick opener, a long pause for the details.
         await wait(TYPING_MS[LINES.indexOf(line)] || 1100);
@@ -64,7 +66,20 @@
       list.appendChild(S.el("li", null, line));
       if (!calm) await wait(450);
     }
-    $("call-go").hidden = false; $("call-go").focus();
+    // The guest's reply types itself out like a message being written, then starts to glow.
+    const go = $("call-go"), reply = go.dataset.text || (go.dataset.text = go.textContent);
+    go.setAttribute("aria-label", reply);
+    if (calm) { go.textContent = reply; go.hidden = false; go.classList.add("typed"); go.focus(); return; }
+    await wait(500);
+    go.textContent = ""; go.classList.remove("typed"); go.hidden = false;
+    const caret = S.el("span", { class: "type-caret", "aria-hidden": "true" });
+    const typed = document.createTextNode("");
+    go.append(typed, caret);
+    for (const ch of reply) { typed.data += ch; await wait(ch === "." ? 260 : 45 + Math.random() * 45); }
+    await wait(250);
+    caret.remove();
+    go.classList.add("typed");
+    go.focus();
   }
   async function declineCall() {
     declines += 1;
@@ -156,12 +171,23 @@
   // a supply counts as covered once anyone has it.
   const whoLabel = (list) => list.length <= 2 ? list.join(", ") : list[0] + " +" + (list.length - 1);
   function claimedNow() { const c = {}; ((board && board.supplies) || []).forEach((x) => { if (x.claimers && x.claimers.length) c[x.id] = whoLabel(x.claimers); }); return c; }
-  const meName = () => (savedName() || "").trim().toLowerCase();
+  const short = stealShortName;
+  const nameKey = (n) => short(n).toLowerCase();
+  const meName = () => nameKey(savedName());
+  // "Dani" and "Dani R" count as the same person; "Dani R" and "Dani M" don't.
+  const sameName = (a, b) => {
+    const ka = nameKey(a), kb = nameKey(b);
+    if (!ka || !kb) return false;
+    if (ka === kb) return true;
+    const [fa, ia] = ka.split(" "), [fb, ib] = kb.split(" ");
+    return fa === fb && (!ia || !ib);
+  };
+  const isMe = (n) => sameName(n, savedName());
   function iHave(id) {
     const x = ((board && board.supplies) || []).find((y) => y.id === id);
     if (!x || !x.claimers || !x.claimers.length) return false;
     const me = meName();
-    return (!!me && x.claimers.some((n) => n.trim().toLowerCase() === me)) || (typeof mine !== "undefined" && mine.supplies.indexOf(id) >= 0);
+    return (!!me && x.claimers.some(isMe)) || (typeof mine !== "undefined" && mine.supplies.indexOf(id) >= 0);
   }
 
   function tagEl(tone, text, extra) { return S.el("span", { class: "tag tag-" + tone + (extra ? " " + extra : "") }, text); }
@@ -184,7 +210,6 @@
       words.appendChild(S.el("span", { class: "label" }, "House special"));
       words.appendChild(S.el("h3", { id: "job-" + d.id, class: "drink-name sign-name feature-name" }, d.name));
       const meta = S.el("div", { class: "drink-meta" });
-      meta.appendChild(status());
       meta.appendChild(S.el("span", { class: "small muted" }, d.real));
       words.appendChild(meta);
       strip.appendChild(words);
@@ -193,11 +218,10 @@
     }
     let missionWords = null;
     if (mission) {
-      // Photo fills the top; "At midnight", the 11:50 tag and heat, the chrome lettering and the real drink sit over its lower left.
+      // Photo fills the top; heat and the big chrome "Mission Passed" lettering sit over its lower left.
       const strip = S.el("div", { class: "drink-art mission-photo" });
       strip.insertAdjacentHTML("beforeend", '<img class="art-night" src="assets/img/drinks/mission-passed-night.jpg" alt="" decoding="async" loading="lazy"><img class="art-day" src="assets/img/drinks/mission-passed-day.jpg" alt="" decoding="async" loading="lazy">');
       missionWords = S.el("div", { class: "look-body on-art mission-words" });
-      missionWords.appendChild(S.el("p", { class: "script mission-kicker" }, "At midnight"));
       strip.appendChild(missionWords);
       art.appendChild(strip);
       art.classList.add("has-art");
@@ -211,10 +235,6 @@
         const h = S.el("h2", { id: "job-" + d.id, class: "mission-art", role: "img", "aria-label": d.name });
         h.insertAdjacentHTML("beforeend", '<img class="art-night" src="assets/img/missions/mission-passed-night.png" alt=""><img class="art-day" src="assets/img/missions/mission-passed-day.png" alt="">');
         missionWords.appendChild(h);
-        const row = S.el("div", { class: "drink-meta" });
-        row.appendChild(status());
-        row.appendChild(S.el("span", { class: "small muted" }, d.real));
-        missionWords.appendChild(row);
       } else {
       const artSlug = DRINK_ART[d.id];
       const head = S.el("div", { class: "drink-head" + (artSlug ? " look-body on-art" : "") });
@@ -222,7 +242,6 @@
       const txt = S.el("div", { class: "drink-title" });
       const line = S.el("div", { class: "drink-title-row" });
       line.appendChild(S.el(mission ? "h2" : "h3", { id: "job-" + d.id, class: "drink-name" + (mission ? " mission-name" : "") }, d.name));
-      line.appendChild(status());
       txt.appendChild(line);
       txt.appendChild(S.el("span", { class: "small muted" }, d.real));
       head.appendChild(txt);
@@ -238,7 +257,6 @@
     }
     // Heat
     const heat = S.el("div", { class: "heat-row" });
-    if (mission) heat.appendChild(tagEl("goal", "11:50 pm"));
     heat.appendChild(S.el("span", { class: "small muted" }, "Heat"));
     const stars = S.el("span", { class: "heat-stars", role: "img", "aria-label": "Heat " + d.heat + " of 5" });
     for (let k = 1; k <= 5; k++) stars.insertAdjacentHTML("beforeend", '<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" class="' + (k <= d.heat ? "on" : "") + '">' + STAR + "</svg>");
@@ -253,6 +271,13 @@
     else if (featureName) { heat.classList.add("heat-on-art"); featureName.parentNode.insertBefore(heat, featureName); }
     else if (missionArt) missionArt.parentNode.insertBefore(heat, missionArt);
     else body.insertBefore(heat, body.firstChild);
+    // A ready drink gets its "Ready" tag on its own line at the top: above "House special" on Vice City, above Heat everywhere else.
+    if (ready) {
+      const top = S.el("div", { class: "ready-above" }); top.appendChild(status());
+      const fw = art.querySelector(".feature-words");
+      if (fw) fw.insertBefore(top, fw.firstChild);
+      else heat.parentNode.insertBefore(top, heat);
+    }
     // Supplies
     const ul = S.el("ul", { class: "supply-chips", "aria-label": "What " + d.name + " needs" });
     d.needs.forEach((id) => {
@@ -292,6 +317,8 @@
     DRINKS.slice(0, 7).forEach((d, i) => jobs.appendChild(drinkCard(d, i === 0, false)));
     const slot = $("mission-slot");
     slot.textContent = "";
+    // "At midnight" sits above the card as a section label, like "Snack run".
+    slot.appendChild(S.el("h2", { class: "label", style: "margin: 0" }, "At midnight"));
     slot.appendChild(drinkCard(DRINKS[7], false, true));
     if (ui.justReady.length) setTimeout(() => { ui.justReady = []; }, 400);
   }
@@ -314,11 +341,12 @@
   // Remembered on this phone (what they claimed here) plus anything on the board under their saved name.
   const mine = (() => { try { return JSON.parse(localStorage.getItem("steal-mine")) || {}; } catch (e) { return {}; } })();
   ["supplies", "beer", "items"].forEach((k) => { if (!Array.isArray(mine[k])) mine[k] = []; });
+  ["beer", "items"].forEach((k) => { mine[k] = mine[k].map((e) => { const i = String(e).indexOf("|"); return i < 0 ? e : stealShortName(e.slice(0, i)) + e.slice(i); }); });
   function saveMine() { try { localStorage.setItem("steal-mine", JSON.stringify(mine)); } catch (e) {} }
   function myStuff() {
     if (!board) return { supplies: [], beer: [], items: [] };
-    const me = (savedName() || "").trim().toLowerCase();
-    const same = (n) => !!me && (n || "").trim().toLowerCase() === me;
+    const me = meName();
+    const same = (n) => !!me && isMe(n);
     const supplies = (board.supplies || []).filter((x) => (x.claimers || []).length && ((x.claimers || []).some(same) || mine.supplies.indexOf(x.id) >= 0));
     const beer = (board.beer || []).filter((b) => same(b.guest_name) || mine.beer.indexOf(b.guest_name + "|" + (b.note || "")) >= 0);
     const items = (board.write_ins || []).filter((w) => same(w.guest_name) || mine.items.indexOf(w.guest_name + "|" + w.item) >= 0);
@@ -366,12 +394,12 @@
   $("mylist-open").addEventListener("click", () => {
     const m = myStuff();
     const count = m.supplies.length + m.beer.length + m.items.length;
-    const mineName = savedName() || (m.beer[0] && m.beer[0].guest_name) || (m.items[0] && m.items[0].guest_name) || "";
+    const mineName = short(savedName()) || (m.beer[0] && m.beer[0].guest_name) || (m.items[0] && m.items[0].guest_name) || "";
     showList("My list", (mineName ? mineName + ", you're" : "You're") + " bringing " + count + (count === 1 ? " thing." : " things."), rowsFor(m), true);
   });
   function showPerson(name) {
     const rows = rowsFor(stuffOf(name));
-    const me = meName() === name.trim().toLowerCase();
+    const me = isMe(name);
     showList(name + (/s$/i.test(name) ? "' list" : "'s list"), name + " is bringing " + rows.length + (rows.length === 1 ? " thing." : " things."), rows, me);
   }
   // Crew names: tap to open their list; on a computer, hovering shows a quick preview.
@@ -381,7 +409,8 @@
       const rows = rowsFor(stuffOf(n));
       const open = ui.openPerson === n;
       const li = S.el("li", { class: "crew-person" + (open ? " is-open" : "") });
-      const b = S.el("button", { type: "button", class: "crew-name", "aria-expanded": open ? "true" : "false", "aria-label": n + ", bringing " + rows.length + (rows.length === 1 ? " thing" : " things") }, n);
+      const b = S.el("button", { type: "button", class: "crew-name" + (isMe(n) ? " is-me" : ""), "aria-expanded": open ? "true" : "false", "aria-label": n + ", bringing " + rows.length + (rows.length === 1 ? " thing" : " things") });
+      b.append(S.el("span", { class: "roster-badge crew-badge", "aria-hidden": "true" }, (n.trim()[0] || "?").toUpperCase()), document.createTextNode(n));
       // Tap (phones) or click toggles the same floating card that hover shows; no dialog.
       b.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -403,14 +432,23 @@
   }
   function closePeople() {
     ui.openPerson = null;
-    document.querySelectorAll(".crew-person.is-open").forEach((x) => { x.classList.remove("is-open"); x.querySelector(".crew-name").setAttribute("aria-expanded", "false"); });
+    document.querySelectorAll(".crew-person.is-open").forEach((x) => { x.classList.remove("is-open"); const b = x.querySelector("button[aria-expanded]"); if (b) b.setAttribute("aria-expanded", "false"); });
   }
-  // Keep the floating card on screen: names near the right edge open it leftward.
+  // Keep the floating card fully on screen and inside its card: measure it, then slide it left or right as needed.
   function placePop(li) {
     const pop = li.querySelector(".person-pop");
     pop.classList.remove("to-left");
+    pop.style.left = "0px"; pop.style.right = "auto";
+    const prev = pop.style.display; pop.style.display = "block"; pop.style.visibility = "hidden";
+    const w = pop.offsetWidth;
+    pop.style.display = prev; pop.style.visibility = "";
     const r = li.getBoundingClientRect();
-    if (r.left + 260 > document.documentElement.clientWidth - 12) pop.classList.add("to-left");
+    const box = (li.closest(".card") || document.documentElement).getBoundingClientRect();
+    const minX = Math.max(box.left, 0) + 8, maxX = Math.min(box.right, document.documentElement.clientWidth) - 8;
+    let x = r.left;
+    if (x + w > maxX) x = maxX - w;
+    if (x < minX) x = minX;
+    pop.style.left = Math.round(x - r.left) + "px";
   }
   document.addEventListener("click", (e) => { if (!e.target.closest(".crew-person")) closePeople(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePeople(); });
@@ -478,7 +516,7 @@
     ui.picked = ui.picked.filter((id) => got.indexOf(id) < 0 && taken.indexOf(id) < 0);
     ui.justReady = DRINKS.filter((x) => !isReady(x, before) && isReady(x, after)).map((x) => x.id);
     const names = (ids) => ids.map((id) => sup[id].name).join(", ");
-    let msg = got.length ? "Thanks, " + name + ". You're bringing " + names(got) + "." : "";
+    let msg = got.length ? "Thanks, " + short(name) + ". You're bringing " + names(got) + "." : "";
     if (ui.justReady.length) msg += " That made " + ui.justReady.map((id) => DRINKS.find((x) => x.id === id).name).join(" and ") + " ready to pour.";
     if (taken.length) msg += " " + names(taken) + (taken.length === 1 ? " is" : " are") + " already maxed out, so we left " + (taken.length === 1 ? "it" : "them") + " off.";
     $("supply-done-text").textContent = msg.trim();
@@ -486,6 +524,170 @@
     await load(true);
     updateTray();
   });
+
+  // Public guest list: "First L" names from the RSVPs, each with what they've claimed (matched on "First L").
+  const guestsDlg = $("guests-dialog");
+  guestsDlg.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => guestsDlg.close()));
+  guestsDlg.addEventListener("click", (e) => { if (e.target === guestsDlg) guestsDlg.close(); });
+  const first = (n) => nameKey(n);
+  function bringingByFirst() {
+    const m = {};
+    const add = (n, item) => { const k = first(n); if (!k) return; (m[k] = m[k] || []).indexOf(item) < 0 && m[k].push(item); };
+    ((board && board.supplies) || []).forEach((x) => (x.claimers || []).forEach((n) => add(n, x.name)));
+    ((board && board.beer) || []).forEach((b) => add(b.guest_name, b.note ? "Beer: " + b.note : "Beer"));
+    ((board && board.write_ins) || []).forEach((w) => add(w.guest_name, w.item));
+    return m;
+  }
+  async function openGuests() {
+    const ul = $("guest-list"); ul.textContent = "";
+    $("guests-count").textContent = "Loading the crew...";
+    $("guest-pager").hidden = true;
+    if (!guestsDlg.open) guestsDlg.showModal();
+    let list;
+    try { list = await S.rpc("get_guest_list", {}); } catch (e) { $("guests-count").textContent = "Couldn't load the guest list. Try again in a minute."; return; }
+    if (!Array.isArray(list)) { $("guests-count").textContent = "Couldn't load the guest list. Try again in a minute."; return; }
+    const total = list.reduce((n, r) => n + (r.party || 1), 0);
+    $("guests-count").textContent = list.length ? total + (total === 1 ? " person is" : " people are") + " in so far." : "Nobody's RSVP'd yet. Be the first.";
+    guestRows = list; guestPage = 0;
+    renderGuestPage();
+  }
+  // Five guests per page, with arrows instead of a scrolling list.
+  const PER_PAGE = 5;
+  let guestRows = [], guestPage = 0;
+  function renderGuestPage() {
+    const ul = $("guest-list"); ul.textContent = "";
+    const pages = Math.max(1, Math.ceil(guestRows.length / PER_PAGE));
+    guestPage = Math.min(Math.max(guestPage, 0), pages - 1);
+    const bring = bringingByFirst();
+    guestRows.slice(guestPage * PER_PAGE, guestPage * PER_PAGE + PER_PAGE).forEach((r) => {
+      const li = S.el("li", { class: "roster-row" + (isMe(r.name) ? " is-me" : "") });
+      li.appendChild(S.el("span", { class: "roster-badge", "aria-hidden": "true" }, (r.name[0] || "?").toUpperCase()));
+      const t = S.el("span", { class: "roster-text" });
+      const extra = (r.guests || []).length ? " with " + r.guests.map(short).join(", ") : (r.party > 1 ? " +" + (r.party - 1) : "");
+      t.appendChild(S.el("span", { class: "ui" }, short(r.name) + extra));
+      const items = []; Object.keys(bring).forEach((k) => { if (sameName(k, r.name)) bring[k].forEach((it) => items.indexOf(it) < 0 && items.push(it)); });
+      t.appendChild(S.el("span", { class: "small " + (items.length ? "guest-brings" : "muted") }, items.length ? items.join(", ") : "Nothing claimed yet"));
+      li.appendChild(t);
+      ul.appendChild(li);
+    });
+    $("guest-pager").hidden = pages < 2;
+    $("guest-page").textContent = "Page " + (guestPage + 1) + " of " + pages;
+    $("guest-prev").disabled = guestPage === 0;
+    $("guest-next").disabled = guestPage >= pages - 1;
+  }
+  $("guest-prev").addEventListener("click", () => { guestPage--; renderGuestPage(); });
+  $("guest-next").addEventListener("click", () => { guestPage++; renderGuestPage(); });
+  document.querySelectorAll("[data-open-guests]").forEach((b) => b.addEventListener("click", openGuests));
+
+  // Heist meter: one slot per drink that fills as its ingredients get claimed and glows when it's ready,
+  // plus a nudge toward the drink that's closest, naming what it still needs.
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+  function renderMeter(claimed) {
+    const sup = supplyMap();
+    const stats = DRINKS.map((d) => { const have = d.needs.filter((id) => claimed[id]).length; return { d, have, need: d.needs.length, ready: have === d.needs.length }; });
+    const readyCount = stats.filter((x) => x.ready).length;
+    $("ready-num").textContent = readyCount;
+    $("ready-total").textContent = DRINKS.length;
+    const slots = $("ready-slots"); slots.textContent = "";
+    slots.setAttribute("aria-label", readyCount + " of " + DRINKS.length + " drinks ready to pour");
+    // Each slot works like a crew name: hover (or tap on phones) shows a floating card with what that drink still needs.
+    stats.forEach((x) => {
+      const key = "drink:" + x.d.id, open = ui.openPerson === key;
+      const li = S.el("li", { class: "crew-person heist-cell" + (open ? " is-open" : "") });
+      const label = x.d.name + (x.ready ? ", ready to pour" : ", " + x.have + " of " + x.need + " ingredients covered");
+      const b = S.el("button", { type: "button", class: "heist-slot" + (x.ready ? " is-ready" : ""), "aria-expanded": open ? "true" : "false", "aria-label": label });
+      const fill = S.el("span", { class: "heist-fill" });
+      fill.style.height = Math.round(x.have / x.need * 100) + "%";
+      b.appendChild(fill);
+      // Hover (or tap) shows the card; the drink's name in the card is the link that jumps to it.
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const was = li.classList.contains("is-open");
+        closePeople();
+        if (!was) { li.classList.add("is-open"); b.setAttribute("aria-expanded", "true"); ui.openPerson = key; placePop(li); }
+      });
+      li.addEventListener("mouseenter", () => { if (ui.openPerson && ui.openPerson !== key) closePeople(); placePop(li); });
+      li.appendChild(b);
+      const pop = S.el("div", { class: "person-pop", "aria-hidden": "true" });
+      const nameBtn = S.el("button", { type: "button", class: "pop-name" });
+      nameBtn.append(S.el("span", { class: "pop-name-t" }, x.d.name), S.el("span", { class: "pop-name-arrow", "aria-hidden": "true" }, "\u2192"));
+      nameBtn.setAttribute("aria-label", "Go to " + x.d.name);
+      nameBtn.addEventListener("click", (e) => { e.stopPropagation(); closePeople(); goToDrink(x.d.id); });
+      pop.appendChild(nameBtn);
+      pop.appendChild(S.el("p", { class: "pop-status" + (x.ready ? " is-ready" : "") }, x.ready ? "Ready to pour" : x.have + " of " + x.need + " covered"));
+      // Still needed first (what someone can grab), then what's already covered and by whom.
+      const nm = (id) => (sup[id] && sup[id].name) || id;
+      const needs = x.d.needs.filter((id) => !claimed[id]), got = x.d.needs.filter((id) => claimed[id]);
+      if (needs.length) {
+        pop.appendChild(S.el("p", { class: "pop-group is-need" }, "Still needs"));
+        const ul = S.el("ul", { class: "pop-list" });
+        needs.forEach((id) => { const it = S.el("li", { class: "pop-need" + (LIQUOR.indexOf(id) >= 0 ? " is-liquor" : "") }); it.append(S.el("span", { class: "pop-mark", "aria-hidden": "true" }), document.createTextNode(nm(id))); ul.appendChild(it); });
+        pop.appendChild(ul);
+      }
+      if (got.length) {
+        pop.appendChild(S.el("p", { class: "pop-group is-got" }, "Covered"));
+        const ul = S.el("ul", { class: "pop-list" });
+        got.forEach((id) => { const it = S.el("li", { class: "pop-got" }); it.append(S.el("span", { class: "pop-mark", "aria-hidden": "true" }), document.createTextNode(nm(id)), S.el("span", { class: "pop-who" }, claimed[id])); ul.appendChild(it); });
+        pop.appendChild(ul);
+      }
+      li.appendChild(pop);
+      slots.appendChild(li);
+      if (open) placePop(li);
+    });
+    const next = $("ready-next");
+    const open = stats.filter((x) => !x.ready).sort((a, b) => (b.have / b.need) - (a.have / a.need) || (a.need - a.have) - (b.need - b.have));
+    next.hidden = false;
+    if (!open.length) { next.disabled = true; next.textContent = "Every drink is covered. The job is on."; next.dataset.target = ""; return; }
+    const t = open[0];
+    const missing = t.d.needs.filter((id) => !claimed[id]).map((id) => (sup[id] && sup[id].name) || id);
+    const list = missing.length > 2 ? missing.slice(0, 2).join(", ") + " and " + (missing.length - 2) + " more" : missing.join(" and ");
+    next.disabled = false;
+    next.dataset.target = "job-" + t.d.id;
+    next.textContent = "";
+    next.append(S.el("span", { class: "heist-next-k" }, t.have ? "Closest" : "Start with"), S.el("span", { class: "heist-next-t" }, t.d.name + " needs " + list.toLowerCase()));
+  }
+  // Bring a drink card to the middle of the visible area (between the top of the screen and the tab bar).
+  // Photos above it can finish loading mid-scroll and push it down, so it re-checks and nudges until it sits centered.
+  function goToDrink(drinkId) {
+    const h = document.getElementById("job-" + drinkId);
+    if (!h) return;
+    const card = h.closest(".drink-card") || h;
+    card.querySelectorAll("img[loading=lazy]").forEach((im) => { im.loading = "eager"; });
+    const targetY = () => {
+      const bar = document.querySelector(".tabbar");
+      const bottom = bar ? bar.getBoundingClientRect().top : window.innerHeight;
+      const r = card.getBoundingClientRect();
+      const room = bottom;
+      const offset = r.height < room - 24 ? (room - r.height) / 2 : 12;
+      return Math.max(0, Math.round(window.scrollY + r.top - offset));
+    };
+    // The last drink sits near the bottom of the page; add just enough room under it so it can still reach the middle.
+    let room = document.getElementById("scroll-room");
+    if (!room) { room = S.el("div", { id: "scroll-room", "aria-hidden": "true" }); $("view-drinks").appendChild(room); }
+    room.style.height = "0px";
+    const maxY = document.documentElement.scrollHeight - window.innerHeight;
+    const want0 = targetY();
+    if (want0 > maxY) room.style.height = (want0 - maxY) + "px";
+    window.scrollTo({ top: targetY(), behavior: calm ? "auto" : "smooth" });
+    // Nudge a couple of times while photos settle, but stop the moment the guest scrolls or touches the page.
+    let tries = 0, stopped = false;
+    const stop = () => { stopped = true; ["wheel", "touchstart", "pointerdown", "keydown"].forEach((t) => window.removeEventListener(t, stop, true)); };
+    ["wheel", "touchstart", "pointerdown", "keydown"].forEach((t) => window.addEventListener(t, stop, { capture: true, passive: true }));
+    const settle = () => {
+      if (stopped) return;
+      const want = targetY();
+      if (Math.abs(window.scrollY - want) > 6) window.scrollTo({ top: want, behavior: "auto" });
+      if (++tries < 3) setTimeout(settle, 400); else stop();
+    };
+    setTimeout(settle, calm ? 300 : 700);
+    card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+  }
+  window.addEventListener("hashchange", () => { const r = document.getElementById("scroll-room"); if (r) r.remove(); });
+  $("ready-next").addEventListener("click", () => {
+    const id = $("ready-next").dataset.target;
+    if (id) goToDrink(id.replace(/^job-/, ""));
+  });
+
 
   function render() {
     const claimed = claimedNow();
@@ -497,22 +699,16 @@
     (board.supplies || []).forEach((x) => (x.claimers || []).forEach(add));
     beer.forEach((b) => add(b.guest_name));
     w.forEach((x) => add(x.guest_name));
-    $("crew-line").textContent = names.length === 0 ? "Nobody's claimed anything yet" : names.length === 1 ? "1 of us is bringing something" : names.length + " of us are bringing something";
+    $("crew-line").textContent = names.length === 0 ? "Nobody's on the crew yet" : names.length === 1 ? "1 on the crew" : names.length + " on the crew";
     renderCrew(names);
-    const readyCount = DRINKS.filter((d) => isReady(d, claimed)).length;
-    const pct = Math.round(readyCount / DRINKS.length * 100);
-    $("ready-fill").style.width = "calc(" + pct + "% - 4px)";
-    $("ready-fill").hidden = pct === 0;
-    $("ready-knob").style.left = pct + "%";
-    $("ready-bar").setAttribute("aria-label", readyCount + " of " + DRINKS.length + " drinks ready to pour");
-    $("ready-text").textContent = readyCount + " of " + DRINKS.length + " drinks ready to pour";
+    renderMeter(claimed);
 
     renderJobs();
 
-    // Rosters inside the beer and "something else" cards: an initial badge, the name, and what they're bringing.
+    // Rosters inside the beer and snacks cards: an initial badge, the name, and what they're bringing.
     const me = meName();
     const rosterRow = (name, title, sub) => {
-      const li = S.el("li", { class: "roster-row" + (me && name.trim().toLowerCase() === me ? " is-me" : "") });
+      const li = S.el("li", { class: "roster-row" + (isMe(name) ? " is-me" : "") });
       li.appendChild(S.el("span", { class: "roster-badge", "aria-hidden": "true" }, (name.trim()[0] || "?").toUpperCase()));
       const t = S.el("span", { class: "roster-text" });
       t.appendChild(S.el("span", { class: "ui" }, title));
@@ -528,7 +724,7 @@
     const wl = $("writein-list"); wl.textContent = "";
     w.forEach((x) => wl.appendChild(rosterRow(x.guest_name, x.guest_name, x.item)));
 
-    renderTicker(board.crew, readyCount, DRINKS.length);
+    renderTicker(board.crew, DRINKS.filter((d) => isReady(d, claimed)).length, DRINKS.length);
     updateTray();
     updateMyList();
   }
@@ -582,6 +778,10 @@
       const key = JSON.stringify(next);
       setStatus($("board-status"), "");
       if (!force && key === boardKey && board) return;
+      // Trim every name to "First L" before anything shows it.
+      (next.supplies || []).forEach((x) => { x.claimers = (x.claimers || []).map(short); });
+      (next.beer || []).forEach((b) => { b.guest_name = short(b.guest_name); });
+      (next.write_ins || []).forEach((w) => { w.guest_name = short(w.guest_name); });
       board = next; boardKey = key;
       render();
     } catch (e) {
@@ -630,7 +830,7 @@
     $("tab-rsvp-label").textContent = done ? "You're in" : "RSVP";
     document.querySelector(".tab-rsvp").classList.toggle("is-done", done);
     $("rsvp-card-text").textContent = done
-      ? "You're on the crew, " + r.name + (r.size > 1 ? " (party of " + r.size + ")" : "") + ". Need to change it? Tap below."
+      ? "You're on the crew, " + short(r.name) + (r.size > 1 ? " (party of " + r.size + ")" : "") + ". Need to change it? Tap below."
       : "Plus-ones welcome. Tell us who's rolling with you.";
     document.querySelector("[data-open-rsvp].btn").textContent = done ? "Change my RSVP" : "Accept the job";
   }
@@ -769,16 +969,20 @@
     $("beer-submit").disabled = true;
     try {
       const r = await S.rpc("add_beer", { p_name: name, p_note: note });
-      if (r === "ok") { rememberName(name); mine.beer.push(name + "|" + note); saveMine(); $("beer-note").value = ""; $("beer-done-text").textContent = "You're on the beer list, " + name + "."; beerDlg.done(); await load(true); }
+      if (r === "ok") { rememberName(name); mine.beer.push(short(name) + "|" + note); saveMine(); $("beer-note").value = ""; $("beer-done-text").textContent = "You're on the beer list, " + short(name) + "."; beerDlg.done(); await load(true); }
       else { setStatus($("beer-status"), r === "full" ? "The beer list is full. Text Sean." : "That didn't go through. Try again.", "err"); $("beer-submit").disabled = false; }
     } catch (e) { setStatus($("beer-status"), LOST, "err"); $("beer-submit").disabled = false; }
   });
 
-  $("wi-open").addEventListener("click", () => {
+  // Snacks: the photo opens a blank form; a quick pick opens it with the food filled in.
+  function openSnacks(item) {
     if (!$("wi-name").value) $("wi-name").value = savedName();
     setStatus($("writein-status"), ""); $("wi-submit").disabled = false;
-    wiDlg.open("wi-item");
-  });
+    if (item != null) $("wi-item").value = item;
+    wiDlg.open(item ? ($("wi-name").value ? "wi-item" : "wi-name") : "wi-item");
+  }
+  $("wi-open").addEventListener("click", () => openSnacks(null));
+  document.querySelectorAll(".snack-pick").forEach((b) => b.addEventListener("click", () => openSnacks(b.dataset.item)));
   $("writein-form").addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const name = $("wi-name").value.trim(), item = $("wi-item").value.trim();
@@ -786,14 +990,14 @@
     $("wi-submit").disabled = true;
     try {
       const r = await S.rpc("add_write_in", { p_name: name, p_item: item });
-      if (r === "ok") { rememberName(name); mine.items.push(name + "|" + item); saveMine(); $("wi-item").value = ""; $("wi-done-text").textContent = item + " is on the list. Thanks, " + name + "."; wiDlg.done(); await load(true); }
+      if (r === "ok") { rememberName(name); mine.items.push(short(name) + "|" + item); saveMine(); $("wi-item").value = ""; $("wi-done-text").textContent = item + " is on the list. Thanks, " + short(name) + "."; wiDlg.done(); await load(true); }
       else { setStatus($("writein-status"), "That didn't go through. Try again.", "err"); $("wi-submit").disabled = false; }
     } catch (e) { setStatus($("writein-status"), LOST, "err"); $("wi-submit").disabled = false; }
   });
 
   // Staggered masonry on two-column screens (Home cards, the drink cards, the "Also on the list" cards).
   // Each card spans as many 2px rows as its height plus the 14px gap, so cards in a column stack with no holes.
-  const masonryLists = [".home-cards", "#jobs", ".also-grid"].map((q) => document.querySelector(q)).filter(Boolean);
+  const masonryLists = [".home-cards", "#jobs"].map((q) => document.querySelector(q)).filter(Boolean);
   const twoCol = window.matchMedia("(min-width: 601px)");
   function layoutList(list) {
     const items = [...list.children];
