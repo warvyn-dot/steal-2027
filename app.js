@@ -1,4 +1,4 @@
-// Guest app: Brian's call, tabs, RSVP (create/edit/cancel), drink claims, write-ins, party mode.
+// Guest app: Sean's call, tabs, RSVP (create/edit/cancel), drink claims, write-ins, party mode.
 (function () {
   const S = window.Steal;
   S.initTheme(document.getElementById("theme-toggle"));
@@ -34,10 +34,10 @@
   window.addEventListener("hashchange", route);
   route();
 
-  // ---------- Brian's call: the way in, once per phone ----------
+  // ---------- Sean's call: the way in, once per phone ----------
   const LINES = [
     "Got a job for you. One night only.",
-    "December 31st, 9 PM. Sean and Grace's place. Wear something loud. Bring a drink from the list.",
+    "December 31st, 9 PM. My place. Wear something loud. Bring a drink from the list.",
     "You in?"
   ];
   const TYPING_MS = [800, 3200, 1100];
@@ -84,7 +84,7 @@
   async function declineCall() {
     declines += 1;
     $("call-status").textContent = "Call declined";
-    $("call-sub").textContent = declines > 1 ? "He's not going to stop." : "Brian doesn't take no for an answer.";
+    $("call-sub").textContent = declines > 1 ? "He's not going to stop." : "Sean doesn't take no for an answer.";
     $("call-accept").disabled = true; $("call-decline").disabled = true;
     await wait(1600);
     $("call-accept").disabled = false; $("call-decline").disabled = false;

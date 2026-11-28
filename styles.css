@@ -364,7 +364,7 @@ td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; }
 #rsvp-form > .field { width: auto !important; flex: none; }
 #rsvp-form > .guests, #rsvp-form > .field:nth-of-type(3), #rsvp-form > .dialog-actions { grid-column: 1 / -1; }
 
-/* ---------- Brian's incoming call (first visit only) ---------- */
+/* ---------- Sean's incoming call (first visit only) ---------- */
 .call {
   position: fixed; inset: 0; z-index: 50; color: #fff1fb;
   background: linear-gradient(180deg, rgba(18, 5, 42, 0.55), rgba(18, 5, 42, 0.92)), #1c0a38 url("assets/img/hero-night.jpg") 70% center / cover no-repeat;
@@ -412,7 +412,8 @@ td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; }
   @keyframes dot-hop { 0%, 60%, 100% { transform: translateY(0); opacity: 0.55; } 30% { transform: translateY(-5px); opacity: 1; } }
 }
 @media (prefers-reduced-motion: no-preference) { .bubbles li { animation: bubble-in 220ms ease-out both; } @keyframes bubble-in { from { opacity: 0; transform: translateY(8px); } } }
-.call-go { margin-top: 14px; }
+/* The guest's reply sits on the right like a sent text */
+.call-go { margin-top: 6px; align-self: flex-end; max-width: 86%; border-radius: 18px 18px 6px 18px; }
 .type-caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -0.15em; background: currentColor; animation: caret-blink 0.8s steps(1) infinite; }
 @keyframes caret-blink { 50% { opacity: 0; } }
 /* "I'm in" pulses a neon glow so it reads as the thing to tap */
@@ -994,7 +995,7 @@ dialog { overflow-x: hidden; }
 [data-theme="golden"] .neon-word { color: #c2187f; text-shadow: 0 0 6px rgba(255, 89, 196, 0.55), 0 0 14px rgba(255, 89, 196, 0.35); }
 @media (prefers-reduced-motion: no-preference) { .neon-word { animation: neon-flicker 4s ease-in-out infinite; } }
 @keyframes neon-flicker { 0%, 100% { opacity: 1; } 47% { opacity: 1; } 48% { opacity: 0.55; } 49% { opacity: 1; } 51% { opacity: 0.7; } 52% { opacity: 1; } }
-.credit-logo { display: inline-flex; border-radius: 8px; transition: transform .15s ease; }
+.credit-logo { display: inline-flex; text-decoration: none; border-radius: 8px; transition: transform .15s ease; }
 .credit-logo:hover { transform: scale(1.04); }
 .credit-logo:active { transform: scale(.97); }
 .credit-logo img { display: none; height: 48px; width: auto; }
